@@ -10,7 +10,7 @@ public class Texture {
     private final String path;
 
     public Texture(String filePath) {
-        this.path = filePath;
+        this.path = "Users/cadenkoehl/IntelliJ/Java/Minecraft2D/" + filePath;
         this.file = new File(filePath);
         this.icon = new ImageIcon(filePath);
     }

@@ -1,9 +1,10 @@
 package com.cadenkoehl.minecraft2D.render;
 
 import com.cadenkoehl.minecraft2D.block.Block;
-import com.cadenkoehl.minecraft2D.display.GamePanel;
-import com.cadenkoehl.minecraft2D.entities.Entity;
-import com.cadenkoehl.minecraft2D.physics.Location;
+import com.cadenkoehl.minecraft2D.display.GameWindow;
+import com.cadenkoehl.minecraft2D.entities.LivingEntity;
+import com.cadenkoehl.minecraft2D.entities.Tile;
+import com.cadenkoehl.minecraft2D.physics.Vec2d;
 import com.cadenkoehl.minecraft2D.world.World;
 
 import javax.swing.*;
@@ -11,24 +12,18 @@ import java.awt.*;
 
 public class Renderer {
 
-    public void render(Block block, int x, int y) {
-        block.render(x, y);
-    }
-
-    public void render(Entity entity, int x, int y) {
-        ImageIcon icon = entity.getTexture().getIcon();
-        Image scaledImage = icon.getImage().getScaledInstance(entity.getWidth(), entity.getHeight(), Image.SCALE_SMOOTH);
+    public static void render(Tile tile, int x, int y) {
+        ImageIcon icon = tile.getTexture().getIcon();
+        Image scaledImage = icon.getImage().getScaledInstance(tile.getWidth(), tile.getHeight(), Image.SCALE_SMOOTH);
         ImageIcon finalIcon = new ImageIcon(scaledImage);
 
-        finalIcon.paintIcon(GamePanel.INSTANCE, GamePanel.GRAPHICS, x, y);
+        finalIcon.paintIcon(GameWindow.INSTANCE, GameWindow.GRAPHICS, x, y);
     }
 
 
-    public void renderTerrain(World world) {
-        for(Location location : world.blocks.keySet()) {
-            Block block = world.blocks.get(location);
-            block.render(location);
-            GamePanel.INSTANCE.repaint(new Rectangle(location.getX(), location.getY(), block.getWidth(), block.getHeight()));
+    public static void renderTerrain(World world) {
+        for(Block block : world.getBlocks()) {
+            block.render();
         }
     }
 }

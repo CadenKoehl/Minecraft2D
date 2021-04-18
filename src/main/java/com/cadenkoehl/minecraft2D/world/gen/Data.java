@@ -1,6 +1,6 @@
 package com.cadenkoehl.minecraft2D.world.gen;
 
-import com.cadenkoehl.minecraft2D.physics.Location;
+import com.cadenkoehl.minecraft2D.physics.Vec2d;
 import com.cadenkoehl.minecraft2D.world.World;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -39,10 +39,10 @@ public class Data {
         return new JSONObject(jsonString);
     }
 
-    public static Location convertBlockKeyToLocation(String key) {
+    public static Vec2d convertBlockKeyToLocation(String key) {
         String[] xy = key.replace(",", "").split("\\s+");
         int x = Integer.parseInt(xy[0]);
         int y = Integer.parseInt(xy[1]);
-        return new Location(x, y);
+        return new Vec2d(x, y);
     }
 }

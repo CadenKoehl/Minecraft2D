@@ -1,13 +1,15 @@
 package com.cadenkoehl.minecraft2D.world;
 
 import com.cadenkoehl.minecraft2D.block.Block;
-import com.cadenkoehl.minecraft2D.physics.Location;
+import com.cadenkoehl.minecraft2D.physics.Vec2d;
 import com.cadenkoehl.minecraft2D.util.LogLevel;
 import com.cadenkoehl.minecraft2D.util.Logger;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public abstract class World {
@@ -19,7 +21,7 @@ public abstract class World {
 
     private int groundHeight = 700;
 
-    public Map<Location, Block> blocks = new HashMap<>();
+    private final List<Block> blocks = new ArrayList<>();
 
     public abstract String getDisplayName();
     public abstract Block getSurfaceBlock();
@@ -31,10 +33,17 @@ public abstract class World {
     public void load() {}
 
     /**
-     * @return a block from a given location
+     * @return a block from a given vec2d
      */
-    public Block getBlock(Location location) {
-        return blocks.get(location);
+    public Block getBlock(Vec2d vec2d) {
+        for(Block block : blocks) {
+            if(block.getLocation() == vec2d) return block;
+        }
+        return null;
+    }
+
+    public List<Block> getBlocks() {
+        return blocks;
     }
 
     /**
@@ -65,9 +74,20 @@ public abstract class World {
      * @return a block from a given location
      */
     public Block getBlock(int x, int y) {
-        return this.getBlock(new Location(x, y));
+        return this.getBlock(new Vec2d(x, y));
     }
 
+    public void setBlock(Block block) {
+        block = block.copy();
+        block.setWorld(this);
+        if(block.pos == null) throw new IllegalStateException("Block has no state yet!");
+        blocks.add(block);
+    }
+
+    public void setBlock(Block block, Vec2d pos) {
+        block.setPos(pos);
+        this.setBlock(block);
+    }
 
     public void setCaveWorld(boolean caveWorld) {
         this.isCaveWorld = caveWorld;

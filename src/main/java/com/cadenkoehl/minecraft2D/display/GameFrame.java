@@ -10,7 +10,7 @@ public class GameFrame extends JFrame {
     public static int HEIGHT = 1000;
 
     public GameFrame() {
-        this.add(new GamePanel(this));
+        this.add(new GameWindow(this));
         this.setSettings();
         this.setVisible(true);
     }

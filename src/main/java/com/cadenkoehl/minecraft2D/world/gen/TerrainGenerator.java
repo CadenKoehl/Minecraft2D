@@ -1,7 +1,7 @@
 package com.cadenkoehl.minecraft2D.world.gen;
 
 import com.cadenkoehl.minecraft2D.block.Block;
-import com.cadenkoehl.minecraft2D.physics.Location;
+import com.cadenkoehl.minecraft2D.physics.Vec2d;
 import com.cadenkoehl.minecraft2D.world.World;
 
 public class TerrainGenerator {
@@ -13,11 +13,15 @@ public class TerrainGenerator {
     }
 
     public void generate() {
-        if(!world.isCaveWorld()) {
-            for(int x = 0; x < 100; x++) {
+        if (!world.isCaveWorld()) {
+            for (int x = 0; x < 10; x++) {
                 Block surfaceBlock = world.getSurfaceBlock();
-                Location surfaceLocation = new Location(x * surfaceBlock.getWidth(), world.getGroundHeight());
-                world.blocks.put(surfaceLocation, surfaceBlock);
+                Vec2d surfaceLocation = new Vec2d(x * surfaceBlock.getWidth(), world.getGroundHeight());
+
+                surfaceBlock.setWorld(world);
+                surfaceBlock.changePosWithoutRender(surfaceLocation);
+
+                world.setBlock(surfaceBlock);
             }
         }
     }
