@@ -19,7 +19,7 @@ public abstract class World {
      */
     private boolean isCaveWorld = false;
 
-    private int groundHeight = 700;
+    private int groundHeight = 5;
 
     private final List<Block> blocks = new ArrayList<>();
 
@@ -37,7 +37,7 @@ public abstract class World {
      */
     public Block getBlock(Vec2d vec2d) {
         for(Block block : blocks) {
-            if(block.getLocation() == vec2d) return block;
+            if(block.pos == vec2d) return block;
         }
         return null;
     }
@@ -51,23 +51,6 @@ public abstract class World {
      */
     public String getName() {
         return this.getDisplayName().toLowerCase().replace(" ", "_");
-    }
-
-
-    /**
-     * @return the file of this world
-     */
-    public File getFile() {
-        File file = new File(this.getName() + ".json");
-        try {
-            if(file.createNewFile()) {
-                Logger.log(LogLevel.INFO, "Created world file for " + this.getDisplayName());
-            }
-        }
-        catch (IOException ex) {
-            ex.printStackTrace();
-        }
-        return file;
     }
 
     /**

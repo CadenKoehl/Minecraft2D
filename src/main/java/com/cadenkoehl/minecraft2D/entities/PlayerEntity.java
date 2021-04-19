@@ -1,17 +1,19 @@
 package com.cadenkoehl.minecraft2D.entities;
 
+import com.cadenkoehl.minecraft2D.block.Block;
 import com.cadenkoehl.minecraft2D.physics.Vec2d;
 import com.cadenkoehl.minecraft2D.render.Texture;
 import com.cadenkoehl.minecraft2D.world.World;
 
 public class PlayerEntity extends LivingEntity {
 
-    public PlayerEntity(Vec2d vec2d, World world) {
+    public PlayerEntity(String username, Vec2d vec2d, World world) {
         super(vec2d, world);
     }
 
-    public PlayerEntity(int x, int y, World world) {
-        super(new Vec2d(x, y), world);
+    public void placeBlock(Block block, Vec2d pos) {
+        this.getWorld().setBlock(block, pos);
+        block.updateGraphics();
     }
 
     @Override
@@ -26,6 +28,6 @@ public class PlayerEntity extends LivingEntity {
 
     @Override
     public String getDisplayName() {
-        return "Player";
+        return "player";
     }
 }

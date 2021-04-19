@@ -6,8 +6,8 @@ import javax.swing.*;
 
 public class GameFrame extends JFrame {
 
-    public static int WIDTH = 2000;
-    public static int HEIGHT = 1000;
+    public static int WIDTH = 1500;
+    public static int HEIGHT = 800;
 
     public GameFrame() {
         this.add(new GameWindow(this));

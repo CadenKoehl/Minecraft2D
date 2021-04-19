@@ -3,6 +3,7 @@ package com.cadenkoehl.minecraft2D.render;
 import com.cadenkoehl.minecraft2D.block.Block;
 import com.cadenkoehl.minecraft2D.display.GameWindow;
 import com.cadenkoehl.minecraft2D.entities.LivingEntity;
+import com.cadenkoehl.minecraft2D.entities.PlayerEntity;
 import com.cadenkoehl.minecraft2D.entities.Tile;
 import com.cadenkoehl.minecraft2D.physics.Vec2d;
 import com.cadenkoehl.minecraft2D.world.World;
@@ -14,10 +15,7 @@ public class Renderer {
 
     public static void render(Tile tile, int x, int y) {
         ImageIcon icon = tile.getTexture().getIcon();
-        Image scaledImage = icon.getImage().getScaledInstance(tile.getWidth(), tile.getHeight(), Image.SCALE_SMOOTH);
-        ImageIcon finalIcon = new ImageIcon(scaledImage);
-
-        finalIcon.paintIcon(GameWindow.INSTANCE, GameWindow.GRAPHICS, x, y);
+        icon.paintIcon(GameWindow.INSTANCE, GameWindow.GRAPHICS, x, y);
     }
 
 

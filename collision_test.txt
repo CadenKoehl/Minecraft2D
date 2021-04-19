@@ -1,0 +1,25 @@
+    public CollisionResult isCollidingWithBlock() {
+        Block top = world.getBlock(new Vec2d(pos.x, pos.y - 1));
+        Block topLeft = world.getBlock(new Vec2d(pos.x - 1, pos.y - 1));
+        Block headTopLeft = world.getBlock(new Vec2d(pos.x - 1, pos.y));
+        Block feetBottomLeft = world.getBlock(new Vec2d(pos.x - 1, pos.y + 1));
+        Block bottomLeft = world.getBlock(new Vec2d(pos.x - 1, pos.y + 2));
+        Block bottom = world.getBlock(new Vec2d(pos.x, pos.y + 2));
+        Block bottomRight = world.getBlock(new Vec2d(pos.x + 1, pos.y + 2));
+        Block feetBottomRight = world.getBlock(new Vec2d(pos.x + 1, pos.y + 1));
+        Block headTopRight = world.getBlock(new Vec2d(pos.x + 1, pos.y));
+        Block topRight = world.getBlock(new Vec2d(pos.x + 1, pos.y - 1));
+
+        if(top != null) return new CollisionResult(top, CollisionResult.Type.UP);
+        if(topLeft != null) return new CollisionResult(topLeft, CollisionResult.Type.LEFT);
+        if(headTopLeft != null) return new CollisionResult(headTopLeft, CollisionResult.Type.LEFT);
+        if(feetBottomLeft != null) return new CollisionResult(feetBottomLeft, CollisionResult.Type.LEFT);
+        if(bottomLeft != null) return new CollisionResult(bottomLeft, CollisionResult.Type.LEFT);
+        if(bottom != null) return new CollisionResult(bottom, CollisionResult.Type.DOWN);
+        if(bottomRight != null) return new CollisionResult(bottomRight, CollisionResult.Type.RIGHT);
+        if(feetBottomRight != null) return new CollisionResult(feetBottomRight, CollisionResult.Type.RIGHT);
+        if(headTopRight != null) return new CollisionResult(headTopRight, CollisionResult.Type.RIGHT);
+        if(topRight != null) return new CollisionResult(topRight, CollisionResult.Type.RIGHT);
+
+        return null;
+    }

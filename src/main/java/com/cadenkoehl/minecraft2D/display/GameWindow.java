@@ -1,7 +1,11 @@
 package com.cadenkoehl.minecraft2D.display;
 
+import com.cadenkoehl.minecraft2D.Minecraft2D;
 import com.cadenkoehl.minecraft2D.block.Block;
+import com.cadenkoehl.minecraft2D.block.Blocks;
 import com.cadenkoehl.minecraft2D.entities.PlayerEntity;
+import com.cadenkoehl.minecraft2D.entities.Tile;
+import com.cadenkoehl.minecraft2D.physics.Vec2d;
 import com.cadenkoehl.minecraft2D.render.Renderer;
 import com.cadenkoehl.minecraft2D.world.Overworld;
 import com.cadenkoehl.minecraft2D.world.Sky;
@@ -9,8 +13,7 @@ import com.cadenkoehl.minecraft2D.world.gen.TerrainGenerator;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
+import java.awt.event.*;
 
 public class GameWindow extends JPanel {
 
@@ -28,12 +31,12 @@ public class GameWindow extends JPanel {
         this.setBackground(Sky.COLOR);
         this.setFocusable(true);
 
-        player = new PlayerEntity(100, 100, overworld);
+        player = new PlayerEntity("Player", new Vec2d(4, 1), overworld);
 
         TerrainGenerator generator = new TerrainGenerator(overworld);
         generator.generate();
 
-        setUpKeys();
+        setUpInput();
 
         isRunning = true;
 
@@ -69,13 +72,16 @@ public class GameWindow extends JPanel {
         Renderer.renderTerrain(overworld);
     }
 
-    public void setUpKeys() {
+    public void setUpInput() {
         this.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
                 switch (e.getKeyCode()) {
                     case KeyEvent.VK_A -> player.setVelocityX(-1);
                     case KeyEvent.VK_D -> player.setVelocityX(1);
+                    case KeyEvent.VK_W -> player.setVelocityY(-1);
+                    case KeyEvent.VK_S -> player.setVelocityY(1);
+                    //case KeyEvent.VK_SPACE -> player.jump();
                 }
             }
 
@@ -83,7 +89,14 @@ public class GameWindow extends JPanel {
             public void keyReleased(KeyEvent e) {
                 switch (e.getKeyCode()) {
                     case KeyEvent.VK_A, KeyEvent.VK_D -> player.setVelocityX(0);
+                    case KeyEvent.VK_W, KeyEvent.VK_S -> player.setVelocityY(0);
                 }
+            }
+        });
+        this.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                player.placeBlock(Blocks.DIRT, Vec2d.toGamePos(new Vec2d(e.getX(), e.getY())));
             }
         });
     }

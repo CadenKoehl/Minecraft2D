@@ -16,7 +16,7 @@ public class TerrainGenerator {
         if (!world.isCaveWorld()) {
             for (int x = 0; x < 10; x++) {
                 Block surfaceBlock = world.getSurfaceBlock();
-                Vec2d surfaceLocation = new Vec2d(x * surfaceBlock.getWidth(), world.getGroundHeight());
+                Vec2d surfaceLocation = new Vec2d(x, world.getGroundHeight());
 
                 surfaceBlock.setWorld(world);
                 surfaceBlock.changePosWithoutRender(surfaceLocation);

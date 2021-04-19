@@ -2,56 +2,90 @@ package com.cadenkoehl.minecraft2D.entities;
 
 import com.cadenkoehl.minecraft2D.block.Block;
 import com.cadenkoehl.minecraft2D.display.GameWindow;
+import com.cadenkoehl.minecraft2D.physics.Direction;
 import com.cadenkoehl.minecraft2D.physics.Vec2d;
 import com.cadenkoehl.minecraft2D.render.Renderer;
 import com.cadenkoehl.minecraft2D.render.Texture;
 import com.cadenkoehl.minecraft2D.world.World;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Represents an object in the game with a texture
  */
 public abstract class Tile {
 
-    public static final int SIZE_MULTIPLIER = 5;
+    public static final int SIZE_MULTIPLIER = 3;
+    public static final int BLOCK_SIZE = SIZE_MULTIPLIER * 16;
     public static final int GRAVITY_MULTIPLIER = 10;
 
     public Vec2d pos;
+    public Vec2d screenPos;
     public Vec2d velocity;
     private World world;
 
     private final String name;
-    private final int height;
-    private final int width;
+    public final int height;
+    public final int width;
 
     public Tile(Vec2d pos, World world) {
         this.pos = pos;
+        if (pos != null) screenPos = Vec2d.toScreenPos(pos);
         this.velocity = new Vec2d(0, 0);
         this.world = world;
         this.name = this.getDisplayName().toLowerCase().replace(" ", "_");
-        this.height = this.getTexture().getIcon().getIconHeight() * SIZE_MULTIPLIER;
-        this.width = this.getTexture().getIcon().getIconWidth() * SIZE_MULTIPLIER;
+        this.height = this.getTexture().getIcon().getIconHeight();
+        this.width = this.getTexture().getIcon().getIconWidth();
     }
 
     public void tick() {
 
-        if(pos == null || world == null) return;
+        if (pos == null || world == null) return;
 
-        if(velocity.x == 0 && velocity.y == 0) return;
+        syncPos();
+        //applyGravity();
 
-        setPosX(this.getPosX() + velocity.x);
-        setPosY(this.getPosY() + velocity.y);
+        if (velocity.x == 0 && velocity.y == 0) return;
+
+        checkCollisions();
+        updatePos();
+    }
+
+    public void updatePos() {
+
+        setScreenPosX(screenPos.x + velocity.x);
+
+        Block blockY = this.getCollidingBlockY();
+
+        if(blockY == null) {
+            setScreenPosY(screenPos.y + velocity.y);
+            return;
+        }
+
+        //if this is below the block
+        if(this.screenPos.y > blockY.screenPos.y) {
+            if(this.velocity.y > 0) {
+                setScreenPosY(screenPos.y + velocity.y);
+            }
+        }
+        if(this.screenPos.y < blockY.screenPos.y) {
+            if(this.velocity.y < 0) {
+                setScreenPosY(screenPos.y + velocity.y);
+            }
+        }
+    }
+
+    protected void syncPos() {
+        if (pos != null) pos = Vec2d.toGamePos(screenPos);
     }
 
     public void render() {
-        Renderer.render(this, this.getPosX() * SIZE_MULTIPLIER, this.getPosY() * SIZE_MULTIPLIER);
+        Renderer.render(this, screenPos.x, screenPos.y);
     }
 
     public String getName() {
         return name;
-    }
-
-    public Vec2d getLocation() {
-        return this.pos;
     }
 
     public World getWorld() {
@@ -79,40 +113,67 @@ public abstract class Tile {
     }
 
     public void setPos(Vec2d pos) {
-        updateGraphics();
         this.pos = pos;
+    }
+
+    public void setScreenPos(Vec2d screenPos) {
         updateGraphics();
+        this.screenPos = screenPos;
+        updateGraphics();
+        setPos(Vec2d.toGamePos(screenPos));
+    }
+
+    public void setScreenPosX(int x) {
+        setScreenPos(new Vec2d(x, screenPos.y));
+    }
+
+    public void setScreenPosY(int y) {
+        setScreenPos(new Vec2d(screenPos.x, y));
     }
 
     public void changePosWithoutRender(Vec2d pos) {
         this.pos = pos;
+        screenPos = Vec2d.toScreenPos(pos);
     }
 
     private void applyGravity() {
-        setVelocityY(1);
+        if(this.isAffectedByGravity()) {
+            setVelocityY(1);
+        }
+    }
+
+    public boolean isAffectedByGravity() {
+        return false;
+    }
+
+    public void checkCollisions() {
+    }
+
+    public boolean hasCollidedWithY(Block block) {
+        return this.screenPos.y < block.screenPos.y + block.getHeight() &&
+                this.screenPos.y + this.height > block.screenPos.y;
     }
 
     public boolean hasCollidedWith(Block block) {
-
-        int blockPosX = block.getLocation().x;
-        int blockPosY = block.getLocation().y;
-
-        int entityWidth = this.getWidth();
-        int entityHeight = this.getHeight();
-
-        int blockHeight = block.getHeight();
-        int blockWidth = block.getWidth();
-        return blockPosX < this.getPosX() + entityWidth &&
-                blockPosX + blockWidth > this.getPosX() &&
-                blockPosY < this.getPosY() + entityHeight &&
-                blockPosY + blockHeight > this.getPosY();
+        return this.screenPos.x < block.screenPos.x + block.getWidth() &&
+                this.screenPos.x + this.width > block.screenPos.x &&
+                this.screenPos.y < block.screenPos.y + block.getHeight() &&
+                this.screenPos.y + this.height > block.screenPos.y;
     }
 
-    public boolean isCollidingWithBlock() {
+    public Block getCollidingBlockY() {
         for(Block block : world.getBlocks()) {
-            if(this.hasCollidedWith(block)) return true;
+            if(this.hasCollidedWithY(block)) return block;
         }
-        return false;
+        return null;
+    }
+
+    public List<Block> getCollidingBlocks() {
+        List<Block> blocks = new ArrayList<>();
+        for (Block block : world.getBlocks()) {
+            if (this.hasCollidedWith(block)) blocks.add(block);
+        }
+        return blocks;
     }
 
     public void setWorld(World world) {
@@ -128,7 +189,10 @@ public abstract class Tile {
     }
 
     protected void updateGraphics() {
-        GameWindow.INSTANCE.repaint(getPosX(), getPosY(), getWidth(), getHeight());
+        if(screenPos == null) {
+            screenPos = Vec2d.toScreenPos(pos);
+        }
+        GameWindow.INSTANCE.repaint(screenPos.x, screenPos.y, width, height);
     }
 
     public int getPosX() {
@@ -140,5 +204,6 @@ public abstract class Tile {
     }
 
     public abstract Texture getTexture();
+
     public abstract String getDisplayName();
 }

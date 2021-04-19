@@ -12,9 +12,25 @@ public abstract class LivingEntity extends Tile {
         super(pos, world);
     }
 
+    @Override
+    public void tick() {
+        super.tick();
+
+    }
+
+    @Override
+    public boolean isAffectedByGravity() {
+        return true;
+    }
+
     public abstract int getMaxHealth();
 
     public void damage(int amount) {
         health = health - amount;
+        if(health < 0) kill();
+    }
+
+    public void kill() {
+
     }
 }
