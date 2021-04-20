@@ -2,7 +2,6 @@ package com.cadenkoehl.minecraft2D.entities;
 
 import com.cadenkoehl.minecraft2D.block.Block;
 import com.cadenkoehl.minecraft2D.display.GameWindow;
-import com.cadenkoehl.minecraft2D.physics.Direction;
 import com.cadenkoehl.minecraft2D.physics.Vec2d;
 import com.cadenkoehl.minecraft2D.render.Renderer;
 import com.cadenkoehl.minecraft2D.render.Texture;
@@ -54,26 +53,52 @@ public abstract class Tile {
 
     public void updatePos() {
 
-        setScreenPosX(screenPos.x + velocity.x);
-
+        Block blockX = this.getCollidingBlockX();
         Block blockY = this.getCollidingBlockY();
 
-        if(blockY == null) {
-            setScreenPosY(screenPos.y + velocity.y);
-            return;
+        if(canUpdateXPos(blockX)) setScreenPosX(screenPos.x + velocity.x);
+        if(canUpdateYPos(blockY)) setScreenPosY(screenPos.y + velocity.y);
+    }
+
+    private boolean canUpdateXPos(Block blockX) {
+        if(blockX == null) return true;
+
+        //if this is to the left of the block
+        if(this.screenPos.x < blockX.screenPos.x) {
+            //if this is going to the right
+            if(this.velocity.x < 0) {
+                return true;
+            }
         }
+        //if this is to the right if the block
+        if(this.screenPos.x > blockX.screenPos.x) {
+            //if this is going to the left
+            if(this.velocity.x > 0) {
+                return true;
+            }
+        }
+        return this.getCollidingBlockY() == null;
+    }
+
+    private boolean canUpdateYPos(Block blockY) {
+        if(blockY == null) return true;
 
         //if this is below the block
         if(this.screenPos.y > blockY.screenPos.y) {
+            //if this is going upwards
             if(this.velocity.y > 0) {
-                setScreenPosY(screenPos.y + velocity.y);
+                return true;
             }
         }
+
+        //if this is above the block
         if(this.screenPos.y < blockY.screenPos.y) {
+            //if this is going downwards
             if(this.velocity.y < 0) {
-                setScreenPosY(screenPos.y + velocity.y);
+                return true;
             }
         }
+        return this.getCollidingBlockX() == null;
     }
 
     protected void syncPos() {
@@ -150,8 +175,13 @@ public abstract class Tile {
     }
 
     public boolean hasCollidedWithY(Block block) {
-        return this.screenPos.y < block.screenPos.y + block.getHeight() &&
+        return this.screenPos.y < block.screenPos.y + block.width &&
                 this.screenPos.y + this.height > block.screenPos.y;
+    }
+
+    public boolean hasCollidedWithX(Block block) {
+        return this.screenPos.x < block.screenPos.x + block.width &&
+                this.screenPos.x + this.width > block.screenPos.x;
     }
 
     public boolean hasCollidedWith(Block block) {
@@ -164,6 +194,13 @@ public abstract class Tile {
     public Block getCollidingBlockY() {
         for(Block block : world.getBlocks()) {
             if(this.hasCollidedWithY(block)) return block;
+        }
+        return null;
+    }
+
+    public Block getCollidingBlockX() {
+        for(Block block : world.getBlocks()) {
+            if(this.hasCollidedWithX(block)) return block;
         }
         return null;
     }
