@@ -1,10 +1,13 @@
 package com.cadenkoehl.minecraft2D.render;
 
 import com.cadenkoehl.minecraft2D.entities.Tile;
+import com.cadenkoehl.minecraft2D.util.LogLevel;
+import com.cadenkoehl.minecraft2D.util.Logger;
 
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
+import java.util.MissingResourceException;
 
 public class Texture {
 
@@ -13,9 +16,13 @@ public class Texture {
     private final String path;
 
     public Texture(String filePath) {
-        this.path = "Users/cadenkoehl/IntelliJ/Java/Minecraft2D/" + filePath;
+        this.path = filePath;
         this.file = new File(filePath);
         this.icon = this.createIcon(filePath);
+
+        if(!this.file.exists()) {
+            throw new IllegalArgumentException(file + " does not exist!");
+        }
     }
 
     private ImageIcon createIcon(String filePath) {

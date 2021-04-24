@@ -1,15 +1,12 @@
 package com.cadenkoehl.minecraft2D.entities;
 
 import com.cadenkoehl.minecraft2D.block.Block;
+import com.cadenkoehl.minecraft2D.block.LogBlock;
 import com.cadenkoehl.minecraft2D.display.GameWindow;
-import com.cadenkoehl.minecraft2D.physics.Direction;
 import com.cadenkoehl.minecraft2D.physics.Vec2d;
 import com.cadenkoehl.minecraft2D.render.Renderer;
 import com.cadenkoehl.minecraft2D.render.Texture;
 import com.cadenkoehl.minecraft2D.world.World;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Represents an object in the game with a texture
@@ -56,85 +53,17 @@ public abstract class Tile {
         updatePos();
     }
 
-    public boolean collisionWithBlock(int x, int y) {
-        return world.getBlock(new Vec2d(x, y)) != null;
-    }
-
     public void updatePos() {
         updatePosX();
         updatePosY();
     }
 
-    private void updatePosX(){
-        //Moving right
-        if(velocity.x > 0) {
-            if(!collisionWithBlock(this.pos.x + 1, this.pos.y) && !collisionWithBlock(this.pos.x + 1, this.pos.y + 1)) {
-                setScreenPosX(screenPos.x + velocity.x);
-            }
-        }
-        //Moving left
-        if(velocity.x < 0) {
-            if(!collisionWithBlock(this.pos.x, this.pos.y) && !collisionWithBlock(this.pos.x, this.pos.y + 1)) {
-                setScreenPosX(screenPos.x + velocity.x);
-            }
-        }
+    protected void updatePosX(){
+        setScreenPosX(screenPos.x + velocity.x);
     }
 
-    private void updatePosY() {
-        //Moving down
-        if(velocity.y > 0) {
-            if(!collisionWithBlock(this.pos.x, this.pos.y + 2)) {
-                setScreenPosY(screenPos.y + velocity.y);
-            }
-        }
-        //Moving up
-        if(velocity.y < 0) {
-            if(!collisionWithBlock(this.pos.x, this.pos.y)) {
-                setScreenPosY(screenPos.y + velocity.y);
-            }
-        }
-    }
-
-
-    public boolean hasCollidedWith(Block block) {
-
-        int playerWidth = this.getCollisionWidth();
-        int playerHeight = this.getCollisionHeight();
-
-        return this.screenPos.x < block.screenPos.x + block.getWidth() &&
-                this.screenPos.x + playerWidth > block.screenPos.x &&
-                this.screenPos.y < block.screenPos.y + block.getHeight() &&
-                this.screenPos.y + playerHeight > block.screenPos.y;
-    }
-
-    public List<Block> getCollidingBlocks() {
-
-        List<Block> blocks = new ArrayList<>();
-
-        for(Block block : world.getBlocks()) {
-            if(this.hasCollidedWith(block)) {
-                blocks.add(block);
-            }
-        }
-        return blocks;
-    }
-
-    public Direction getDirection() {
-        if(Math.abs(velocity.x) > Math.abs(velocity.y)) {
-            if(velocity.x < 0) {
-                return Direction.LEFT;
-            }
-            if(velocity.x > 0) {
-                return Direction.RIGHT;
-            }
-        }
-        if(velocity.y < 0) {
-            return Direction.UP;
-        }
-        if(velocity.y > 0) {
-            return Direction.DOWN;
-        }
-        return null;
+    protected void updatePosY() {
+        setScreenPosY(screenPos.y + velocity.y);
     }
 
     protected void syncPos() {

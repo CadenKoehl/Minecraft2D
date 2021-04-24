@@ -5,12 +5,15 @@ import com.cadenkoehl.minecraft2D.block.Blocks;
 import com.cadenkoehl.minecraft2D.entities.PlayerEntity;
 import com.cadenkoehl.minecraft2D.physics.Vec2d;
 import com.cadenkoehl.minecraft2D.render.Renderer;
+import com.cadenkoehl.minecraft2D.util.LogLevel;
+import com.cadenkoehl.minecraft2D.util.Logger;
 import com.cadenkoehl.minecraft2D.world.Overworld;
 import com.cadenkoehl.minecraft2D.world.Sky;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.ConcurrentModificationException;
 
 public class GameWindow extends JPanel {
 
@@ -28,7 +31,7 @@ public class GameWindow extends JPanel {
         this.setBackground(Sky.COLOR);
         this.setFocusable(true);
 
-        player = new PlayerEntity("Player", new Vec2d(5, 1), overworld);
+        player = new PlayerEntity("Player", new Vec2d(10, 1), overworld);
 
         setUpInput();
 
@@ -51,9 +54,8 @@ public class GameWindow extends JPanel {
 
     public void tick() {
         player.tick();
-        for(Block block: overworld.getBlocks()) {
-            block.tick();
-        }
+        Renderer.CAMERA.centerOn(player);
+        overworld.tick();
         if(!player.isAlive()) {
             isRunning = false;
         }
@@ -67,8 +69,8 @@ public class GameWindow extends JPanel {
         GameFrame.WIDTH = FRAME.getWidth();
 
         if(isRunning) {
-            player.render();
             overworld.render();
+            player.render();
         }
         else {
             g.setFont(new Font("Courier", Font.BOLD, 60));
@@ -100,10 +102,10 @@ public class GameWindow extends JPanel {
             @Override
             public void mouseClicked(MouseEvent e) {
 
-                Vec2d pos = Vec2d.toGamePos(new Vec2d(e.getX(), e.getY()));
+                Vec2d pos = Vec2d.toGamePos(new Vec2d(e.getX() + Renderer.CAMERA.offset.x, e.getY() + Renderer.CAMERA.offset.y));
 
                 switch (e.getButton()) {
-                    case MouseEvent.BUTTON3 -> player.placeBlock(Blocks.DIRT, pos);
+                    case MouseEvent.BUTTON3 -> player.placeBlock(pos);
                     case MouseEvent.BUTTON1 -> player.breakBlock(pos);
                 }
             }

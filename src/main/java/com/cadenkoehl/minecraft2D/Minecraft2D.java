@@ -7,7 +7,7 @@ public class Minecraft2D {
     public static final String TITLE = "Minecraft 2D";
     public static String USERNAME;
 
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) {
         new GameFrame();
     }
 }

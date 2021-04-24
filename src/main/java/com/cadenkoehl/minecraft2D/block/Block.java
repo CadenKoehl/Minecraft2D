@@ -7,8 +7,28 @@ import com.cadenkoehl.minecraft2D.world.World;
 
 public abstract class Block extends Tile {
 
+    private boolean canCollide;
+    private boolean mined;
+
     public Block(Vec2d pos, World world) {
         super(pos, world);
+        canCollide = true;
+    }
+
+    public void setCanCollide(boolean canCollide) {
+        this.canCollide = canCollide;
+    }
+
+    public boolean canCollide() {
+        return canCollide;
+    }
+
+    public boolean isMined() {
+        return mined;
+    }
+
+    public void mine() {
+        mined = true;
     }
 
     @Override
@@ -23,6 +43,11 @@ public abstract class Block extends Tile {
             @Override
             public String getDisplayName() {
                 return displayName;
+            }
+
+            @Override
+            public boolean canCollide() {
+                return canCollide;
             }
         };
     }

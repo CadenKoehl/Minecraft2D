@@ -1,33 +1,82 @@
 package com.cadenkoehl.minecraft2D.world.gen;
 
 import com.cadenkoehl.minecraft2D.block.Block;
+import com.cadenkoehl.minecraft2D.block.Blocks;
 import com.cadenkoehl.minecraft2D.display.GameFrame;
 import com.cadenkoehl.minecraft2D.entities.Tile;
 import com.cadenkoehl.minecraft2D.physics.Vec2d;
 import com.cadenkoehl.minecraft2D.world.World;
 
-public interface TerrainGenerator {
+public abstract class TerrainGenerator {
 
-    World getWorld();
-    Block getSurfaceBlock();
-    Block getDefaultBlock();
+    abstract World getWorld();
+    abstract Block getSurfaceBlock();
+    abstract Block getDefaultBlock();
+    abstract boolean shouldGenerateTrees();
 
-    default void generate() {
+    private final int surfaceHeight = GameFrame.HEIGHT / Tile.BLOCK_SIZE - 2;
+    private final World world = this.getWorld();
 
-        final int surfaceHeight = GameFrame.HEIGHT / Tile.BLOCK_SIZE - 2;
+    public void generate() {
 
-        World world = this.getWorld();
-        for(int x = 0; x < GameFrame.WIDTH / Block.BLOCK_SIZE + 1; x++) {
-            world.setBlock(this.getSurfaceBlock(), new Vec2d(x, surfaceHeight));
-            world.setBlock(this.getDefaultBlock(), new Vec2d(x, surfaceHeight + 1));
+        for(int x = 0; x < GameFrame.WIDTH / Block.BLOCK_SIZE + 500; x++) {
+
+            //surface
+            gen(this.getSurfaceBlock(), x, surfaceHeight);
+            gen(this.getDefaultBlock(), x, surfaceHeight + 1);
+
+            //trees
+            if(this.shouldGenerateTrees()) {
+                if(x % 10 == 0) {
+                    if(random(3)) genTree(x, surfaceHeight);
+                }
+            }
         }
     }
 
-    class Builder {
+    private void genTree(int x, int y) {
+
+        gen(Blocks.LOG, x, y, false);
+        gen(Blocks.LOG, x, y - 1, false);
+        gen(Blocks.LOG, x, y - 2, false);
+        gen(Blocks.LOG, x, y - 3, false);
+        gen(Blocks.LEAF_BLOCK, x, y - 4, false);
+        gen(Blocks.LEAF_BLOCK, x + 1, y - 4, false);
+        gen(Blocks.LEAF_BLOCK, x + 1, y - 5);
+        gen(Blocks.LEAF_BLOCK, x - 1, y - 5, false);
+        gen(Blocks.LEAF_BLOCK, x + 2, y - 4);
+        gen(Blocks.LEAF_BLOCK, x - 1, y - 4);
+        gen(Blocks.LEAF_BLOCK, x - 2, y - 4);
+        gen(Blocks.LEAF_BLOCK, x, y - 5);
+        gen(Blocks.LEAF_BLOCK, x, y - 6, false);
+    }
+
+    private void gen(Block block, int x, int y, boolean canCollide) {
+        World world = this.getWorld();
+        Block blockCopy = block.copy();
+        blockCopy.setCanCollide(canCollide);
+        world.setBlock(blockCopy, new Vec2d(x, y));
+    }
+
+    private void gen(Block block, int x, int y) {
+        gen(block, x, y, true);
+    }
+
+    /**
+     * @param chance The probability that this method will return true
+     * @return true or false
+     */
+    private boolean random(int chance) {
+        int random = (int) Math.round(Math.random() * Math.abs(chance));
+        return random == 1;
+    }
+
+    public static class Builder {
 
         private final World world;
         private Block surfaceBlock;
         private Block defaultBlock;
+        private boolean trees;
 
         public Builder(World world) {
             this.world = world;
@@ -40,6 +89,11 @@ public interface TerrainGenerator {
 
         public Builder defaultBlock(Block defaultBlock) {
             this.defaultBlock = defaultBlock;
+            return this;
+        }
+
+        public Builder addTrees() {
+            this.trees = true;
             return this;
         }
 
@@ -57,6 +111,11 @@ public interface TerrainGenerator {
                 @Override
                 public Block getDefaultBlock() {
                     return defaultBlock;
+                }
+
+                @Override
+                public boolean shouldGenerateTrees() {
+                    return trees;
                 }
             };
         }

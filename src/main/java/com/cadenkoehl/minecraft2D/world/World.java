@@ -1,17 +1,17 @@
 package com.cadenkoehl.minecraft2D.world;
 
 import com.cadenkoehl.minecraft2D.block.Block;
+import com.cadenkoehl.minecraft2D.block.Blocks;
+import com.cadenkoehl.minecraft2D.display.GameFrame;
 import com.cadenkoehl.minecraft2D.physics.Vec2d;
+import com.cadenkoehl.minecraft2D.render.Renderer;
 import com.cadenkoehl.minecraft2D.util.LogLevel;
 import com.cadenkoehl.minecraft2D.util.Logger;
 import com.cadenkoehl.minecraft2D.world.gen.TerrainGenerator;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public abstract class World {
 
@@ -24,6 +24,24 @@ public abstract class World {
     public abstract String getDisplayName();
     public abstract TerrainGenerator getGenerator();
 
+    public void tick() {
+        try {
+            List<Block> minedBlocks = new ArrayList<>();
+            for(Block block: blocks) {
+                if(block.isMined()) {
+                    minedBlocks.add(block);
+                }
+                block.tick();
+            }
+            for(Block block : minedBlocks) {
+                blocks.remove(block);
+            }
+        }
+        catch (ConcurrentModificationException ex) {
+            System.out.println("test");
+        }
+    }
+
     public void genSpawnTerrain() {
         this.getGenerator().generate();
     }
@@ -33,6 +51,7 @@ public abstract class World {
      */
     public Block getBlock(Vec2d vec2d) {
         for(Block block : blocks) {
+            if(block == null) continue;
             if(block.pos.x == vec2d.x && block.pos.y == vec2d.y) return block;
         }
         return null;
@@ -56,16 +75,27 @@ public abstract class World {
         return this.getBlock(new Vec2d(x, y));
     }
 
-    public void setBlock(Block block) {
+    public void setBlock(Block block, boolean canCollide) {
         block = block.copy();
         block.setWorld(this);
         if(block.pos == null) throw new IllegalStateException("Block has no state yet!");
-        blocks.add(block);
+        if(this.getBlock(block.pos.x, block.pos.y) == null) {
+            blocks.add(block);
+        }
+    }
+
+    public void setBlock(Block block) {
+        setBlock(block, true);
     }
 
     public void setBlock(Block block, Vec2d pos) {
         block.setPos(pos);
         this.setBlock(block);
+    }
+
+    public void setBlock(Block block, Vec2d pos, boolean canCollide) {
+        block.setPos(pos);
+        this.setBlock(block, canCollide);
     }
 
 
@@ -80,13 +110,23 @@ public abstract class World {
         }
         if(brokeBlock == null) return;
 
-        blocks.remove(brokeBlock);
-        brokeBlock.updateGraphics();
+        brokeBlock.mine();
     }
 
     public void render() {
-        for(Block block : blocks) {
-            block.render();
+        try {
+            for(Block block : blocks) {
+                if(block.screenPos.x - Renderer.CAMERA.offset.x > -50 && block.screenPos.x - Renderer.CAMERA.offset.x < GameFrame.WIDTH) {
+                    block.render();
+                }
+            }
+        }
+        catch (ConcurrentModificationException ex) {
+            for(Block block : blocks) {
+                if(block.screenPos.x - Renderer.CAMERA.offset.x > -50 && block.screenPos.x - Renderer.CAMERA.offset.x < GameFrame.WIDTH) {
+                    block.render();
+                }
+            }
         }
     }
 }

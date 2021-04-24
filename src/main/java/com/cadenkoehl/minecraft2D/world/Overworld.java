@@ -15,6 +15,7 @@ public class Overworld extends World {
         return new TerrainGenerator.Builder(this)
                 .defaultBlock(Blocks.DIRT)
                 .surfaceBlock(Blocks.GRASS_BLOCK)
+                .addTrees()
                 .build();
     }
 }
