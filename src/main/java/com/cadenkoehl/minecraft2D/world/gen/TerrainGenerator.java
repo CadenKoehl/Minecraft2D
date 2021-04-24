@@ -1,28 +1,64 @@
 package com.cadenkoehl.minecraft2D.world.gen;
 
 import com.cadenkoehl.minecraft2D.block.Block;
+import com.cadenkoehl.minecraft2D.display.GameFrame;
+import com.cadenkoehl.minecraft2D.entities.Tile;
 import com.cadenkoehl.minecraft2D.physics.Vec2d;
 import com.cadenkoehl.minecraft2D.world.World;
 
-public class TerrainGenerator {
+public interface TerrainGenerator {
 
-    private final World world;
+    World getWorld();
+    Block getSurfaceBlock();
+    Block getDefaultBlock();
 
-    public TerrainGenerator(World world) {
-        this.world = world;
+    default void generate() {
+
+        final int surfaceHeight = GameFrame.HEIGHT / Tile.BLOCK_SIZE - 2;
+
+        World world = this.getWorld();
+        for(int x = 0; x < GameFrame.WIDTH / Block.BLOCK_SIZE + 1; x++) {
+            world.setBlock(this.getSurfaceBlock(), new Vec2d(x, surfaceHeight));
+            world.setBlock(this.getDefaultBlock(), new Vec2d(x, surfaceHeight + 1));
+        }
     }
 
-    public void generate() {
-        if (!world.isCaveWorld()) {
-            for (int x = 0; x < 10; x++) {
-                Block surfaceBlock = world.getSurfaceBlock();
-                Vec2d surfaceLocation = new Vec2d(x, world.getGroundHeight());
+    class Builder {
 
-                surfaceBlock.setWorld(world);
-                surfaceBlock.changePosWithoutRender(surfaceLocation);
+        private final World world;
+        private Block surfaceBlock;
+        private Block defaultBlock;
 
-                world.setBlock(surfaceBlock);
-            }
+        public Builder(World world) {
+            this.world = world;
+        }
+
+        public Builder surfaceBlock(Block surfaceBlock) {
+            this.surfaceBlock = surfaceBlock;
+            return this;
+        }
+
+        public Builder defaultBlock(Block defaultBlock) {
+            this.defaultBlock = defaultBlock;
+            return this;
+        }
+
+        public TerrainGenerator build() {
+            return new TerrainGenerator() {
+                @Override
+                public World getWorld() {
+                    return world;
+                }
+                @Override
+                public Block getSurfaceBlock() {
+                    return surfaceBlock;
+                }
+
+                @Override
+                public Block getDefaultBlock() {
+                    return defaultBlock;
+                }
+            };
         }
     }
 }

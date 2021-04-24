@@ -26,4 +26,14 @@ public abstract class Block extends Tile {
             }
         };
     }
+
+    @Override
+    public int getCollisionHeight() {
+        return 0;
+    }
+
+    @Override
+    public int getCollisionWidth() {
+        return 0;
+    }
 }

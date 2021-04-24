@@ -7,7 +7,6 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="Minecraft2D" />
-        <module name="Minecraft2D (Old Java Project)" />
       </profile>
     </annotationProcessing>
   </component>

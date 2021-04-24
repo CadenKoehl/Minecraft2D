@@ -6,8 +6,8 @@ import javax.swing.*;
 
 public class GameFrame extends JFrame {
 
-    public static int WIDTH = 1500;
-    public static int HEIGHT = 800;
+    public static int WIDTH = 1000;
+    public static int HEIGHT = 600;
 
     public GameFrame() {
         this.add(new GameWindow(this));
@@ -20,5 +20,6 @@ public class GameFrame extends JFrame {
         this.setTitle(Minecraft2D.TITLE);
         this.setSize(WIDTH, HEIGHT);
         this.setLocationRelativeTo(null);
+        //this.setResizable(false);
     }
 }

@@ -1,15 +1,12 @@
 package com.cadenkoehl.minecraft2D.display;
 
-import com.cadenkoehl.minecraft2D.Minecraft2D;
 import com.cadenkoehl.minecraft2D.block.Block;
 import com.cadenkoehl.minecraft2D.block.Blocks;
 import com.cadenkoehl.minecraft2D.entities.PlayerEntity;
-import com.cadenkoehl.minecraft2D.entities.Tile;
 import com.cadenkoehl.minecraft2D.physics.Vec2d;
 import com.cadenkoehl.minecraft2D.render.Renderer;
 import com.cadenkoehl.minecraft2D.world.Overworld;
 import com.cadenkoehl.minecraft2D.world.Sky;
-import com.cadenkoehl.minecraft2D.world.gen.TerrainGenerator;
 
 import javax.swing.*;
 import java.awt.*;
@@ -31,10 +28,7 @@ public class GameWindow extends JPanel {
         this.setBackground(Sky.COLOR);
         this.setFocusable(true);
 
-        player = new PlayerEntity("Player", new Vec2d(4, 1), overworld);
-
-        TerrainGenerator generator = new TerrainGenerator(overworld);
-        generator.generate();
+        player = new PlayerEntity("Player", new Vec2d(5, 1), overworld);
 
         setUpInput();
 
@@ -52,12 +46,16 @@ public class GameWindow extends JPanel {
                 e.printStackTrace();
             }
         }
+        repaint();
     }
 
     public void tick() {
         player.tick();
-        for (Block block: overworld.getBlocks()) {
+        for(Block block: overworld.getBlocks()) {
             block.tick();
+        }
+        if(!player.isAlive()) {
+            isRunning = false;
         }
     }
 
@@ -68,8 +66,14 @@ public class GameWindow extends JPanel {
         GameFrame.HEIGHT = FRAME.getHeight();
         GameFrame.WIDTH = FRAME.getWidth();
 
-        player.render();
-        Renderer.renderTerrain(overworld);
+        if(isRunning) {
+            player.render();
+            overworld.render();
+        }
+        else {
+            g.setFont(new Font("Courier", Font.BOLD, 60));
+            g.drawString("Game Over", GameFrame.WIDTH / 2 - 165, GameFrame.HEIGHT / 2 - 30);
+        }
     }
 
     public void setUpInput() {
@@ -79,9 +83,9 @@ public class GameWindow extends JPanel {
                 switch (e.getKeyCode()) {
                     case KeyEvent.VK_A -> player.setVelocityX(-1);
                     case KeyEvent.VK_D -> player.setVelocityX(1);
-                    case KeyEvent.VK_W -> player.setVelocityY(-1);
-                    case KeyEvent.VK_S -> player.setVelocityY(1);
-                    //case KeyEvent.VK_SPACE -> player.jump();
+                    case KeyEvent.VK_SPACE -> player.jump();
+                    case KeyEvent.VK_K -> player.damage(1);
+                    case KeyEvent.VK_G -> repaint();
                 }
             }
 
@@ -89,14 +93,19 @@ public class GameWindow extends JPanel {
             public void keyReleased(KeyEvent e) {
                 switch (e.getKeyCode()) {
                     case KeyEvent.VK_A, KeyEvent.VK_D -> player.setVelocityX(0);
-                    case KeyEvent.VK_W, KeyEvent.VK_S -> player.setVelocityY(0);
                 }
             }
         });
         this.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                player.placeBlock(Blocks.DIRT, Vec2d.toGamePos(new Vec2d(e.getX(), e.getY())));
+
+                Vec2d pos = Vec2d.toGamePos(new Vec2d(e.getX(), e.getY()));
+
+                switch (e.getButton()) {
+                    case MouseEvent.BUTTON3 -> player.placeBlock(Blocks.DIRT, pos);
+                    case MouseEvent.BUTTON1 -> player.breakBlock(pos);
+                }
             }
         });
     }

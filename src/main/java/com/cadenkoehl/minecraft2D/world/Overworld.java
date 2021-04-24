@@ -1,12 +1,9 @@
 package com.cadenkoehl.minecraft2D.world;
 
-import com.cadenkoehl.minecraft2D.block.Block;
 import com.cadenkoehl.minecraft2D.block.Blocks;
+import com.cadenkoehl.minecraft2D.world.gen.TerrainGenerator;
 
 public class Overworld extends World {
-
-    @Override
-    public void load() {}
 
     @Override
     public String getDisplayName() {
@@ -14,7 +11,10 @@ public class Overworld extends World {
     }
 
     @Override
-    public Block getSurfaceBlock() {
-        return Blocks.GRASS_BLOCK;
+    public TerrainGenerator getGenerator() {
+        return new TerrainGenerator.Builder(this)
+                .defaultBlock(Blocks.DIRT)
+                .surfaceBlock(Blocks.GRASS_BLOCK)
+                .build();
     }
 }

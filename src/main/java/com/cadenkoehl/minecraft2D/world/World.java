@@ -4,6 +4,7 @@ import com.cadenkoehl.minecraft2D.block.Block;
 import com.cadenkoehl.minecraft2D.physics.Vec2d;
 import com.cadenkoehl.minecraft2D.util.LogLevel;
 import com.cadenkoehl.minecraft2D.util.Logger;
+import com.cadenkoehl.minecraft2D.world.gen.TerrainGenerator;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,30 +15,25 @@ import java.util.Map;
 
 public abstract class World {
 
-    /**
-     * Controls if this world should generate like the nether
-     */
-    private boolean isCaveWorld = false;
-
-    private int groundHeight = 5;
-
     private final List<Block> blocks = new ArrayList<>();
 
+    public World() {
+        this.genSpawnTerrain();
+    }
+
     public abstract String getDisplayName();
-    public abstract Block getSurfaceBlock();
+    public abstract TerrainGenerator getGenerator();
 
-
-    /**
-     * This method is called when the world loads
-     */
-    public void load() {}
+    public void genSpawnTerrain() {
+        this.getGenerator().generate();
+    }
 
     /**
-     * @return a block from a given vec2d
+     * @return a block from a given pos
      */
     public Block getBlock(Vec2d vec2d) {
         for(Block block : blocks) {
-            if(block.pos == vec2d) return block;
+            if(block.pos.x == vec2d.x && block.pos.y == vec2d.y) return block;
         }
         return null;
     }
@@ -72,19 +68,25 @@ public abstract class World {
         this.setBlock(block);
     }
 
-    public void setCaveWorld(boolean caveWorld) {
-        this.isCaveWorld = caveWorld;
+
+    public void breakBlock(Vec2d pos) {
+
+        Block brokeBlock = null;
+
+        for(Block block : blocks) {
+            if(block.pos.x == pos.x && block.pos.y == pos.y) {
+                brokeBlock = block;
+            }
+        }
+        if(brokeBlock == null) return;
+
+        blocks.remove(brokeBlock);
+        brokeBlock.updateGraphics();
     }
 
-    public boolean isCaveWorld() {
-        return this.isCaveWorld;
-    }
-
-    public void setGroundHeight(int groundHeight) {
-        this.groundHeight = groundHeight;
-    }
-
-    public int getGroundHeight() {
-        return this.groundHeight;
+    public void render() {
+        for(Block block : blocks) {
+            block.render();
+        }
     }
 }
