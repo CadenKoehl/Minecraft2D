@@ -23,21 +23,40 @@ public abstract class HostileEntity extends LivingEntity {
     }
 
     public void followPlayer() {
-
-        if(GameWindow.player.pos.x > this.pos.x) {
-            moveRight(1);
+        if(distanceFrom(GameWindow.player) >= getReach() / 3) {
+            if(GameWindow.player.pos.x > this.pos.x) {
+                moveRight(1);
+            }
+            if(GameWindow.player.pos.x < this.pos.x) {
+                moveLeft(1);
+            }
         }
-        if(GameWindow.player.pos.x < this.pos.x) {
-            moveLeft(1);
+        else {
+            if(GameWindow.player.pos.x > this.pos.x) {
+                if(velocity.x > 0) {
+                    setVelocityX(0);
+                }
+            }
+            if(GameWindow.player.pos.x < this.pos.x) {
+                if(velocity.x < 0) {
+                    setVelocityX(0);
+                }
+            }
+            tryAttack(GameWindow.player);
         }
     }
 
     public void runAwayFromPlayer() {
-        if(GameWindow.player.pos.x > this.pos.x) {
-            moveLeft(1);
+        if(distanceFrom(GameWindow.player) <= GameWindow.player.getReach()) {
+            if(GameWindow.player.pos.x > this.pos.x) {
+                moveLeft(1);
+            }
+            if(GameWindow.player.pos.x < this.pos.x) {
+                moveRight(1);
+            }
         }
-        if(GameWindow.player.pos.x < this.pos.x) {
-            moveRight(1);
+        else {
+            setVelocityX(0);
         }
     }
 

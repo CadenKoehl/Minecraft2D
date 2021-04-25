@@ -1,6 +1,7 @@
 package com.cadenkoehl.minecraft2D.world;
 
 import com.cadenkoehl.minecraft2D.block.Block;
+import com.cadenkoehl.minecraft2D.block.StoneBlock;
 import com.cadenkoehl.minecraft2D.display.GameFrame;
 import com.cadenkoehl.minecraft2D.entities.Tile;
 import com.cadenkoehl.minecraft2D.entities.mob.LivingEntity;
@@ -140,21 +141,21 @@ public abstract class World {
 
     public void render() {
         try {
-            for(Block block : blocks) {
-                if(block.screenPos.x - Renderer.CAMERA.offset.x > -50 && block.screenPos.x - Renderer.CAMERA.offset.x < GameFrame.WIDTH) {
-                    block.render();
-                }
-            }
-            for(Tile entity : entities) {
-                entity.render();
-            }
+            renderBlocks();
         }
         catch (ConcurrentModificationException ex) {
-            for(Block block : blocks) {
-                if(block.screenPos.x - Renderer.CAMERA.offset.x > -50 && block.screenPos.x - Renderer.CAMERA.offset.x < GameFrame.WIDTH) {
-                    block.render();
-                }
+            renderBlocks();
+        }
+    }
+    private void renderBlocks() {
+        for(Block block : blocks) {
+            if(block.screenPos.x - Renderer.CAMERA.offset.x > -50 && block.screenPos.x - Renderer.CAMERA.offset.x < GameFrame.WIDTH
+            && block.screenPos.y - Renderer.CAMERA.offset.y > -50 && block.screenPos.y - Renderer.CAMERA.offset.y < GameFrame.HEIGHT) {
+                block.render();
             }
+        }
+        for(Tile entity : entities) {
+            entity.render();
         }
     }
 }

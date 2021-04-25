@@ -29,6 +29,10 @@ public abstract class Block extends Tile {
         return canCollide;
     }
 
+    public boolean canBeMined() {
+        return true;
+    }
+
     public boolean isMined() {
         return mined;
     }

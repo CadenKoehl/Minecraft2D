@@ -3,6 +3,7 @@ package com.cadenkoehl.minecraft2D.entities.mob;
 import com.cadenkoehl.minecraft2D.block.Block;
 import com.cadenkoehl.minecraft2D.entities.Tile;
 import com.cadenkoehl.minecraft2D.physics.Vec2d;
+import com.cadenkoehl.minecraft2D.util.TimeUtil;
 import com.cadenkoehl.minecraft2D.world.World;
 
 import java.util.Timer;
@@ -136,9 +137,13 @@ public abstract class LivingEntity extends Tile {
             if(target.damage(this.getBaseAttackDamage())) {
                 if(target.screenPos.x > this.screenPos.x) {
                     target.moveRight(3);
+                    TimeUtil.scheduleTask(() -> target.moveRight(1), 100);
+                    TimeUtil.scheduleTask(() -> target.setVelocityX(0), 400);
                 }
                 if(target.screenPos.x < this.screenPos.x) {
                     target.moveLeft(3);
+                    TimeUtil.scheduleTask(() -> target.moveLeft(1), 100);
+                    TimeUtil.scheduleTask(() -> target.setVelocityX(0), 400);
                 }
                 target.jump();
                 return true;

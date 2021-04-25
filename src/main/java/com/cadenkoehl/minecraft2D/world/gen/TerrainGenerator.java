@@ -11,6 +11,7 @@ public abstract class TerrainGenerator {
 
     abstract World getWorld();
     abstract Block getSurfaceBlock();
+    abstract Block getSecondarySurfaceBlock();
     abstract Block getDefaultBlock();
     abstract boolean shouldGenerateTrees();
 
@@ -23,7 +24,8 @@ public abstract class TerrainGenerator {
 
             //surface
             gen(this.getSurfaceBlock(), x, surfaceHeight);
-            gen(this.getDefaultBlock(), x, surfaceHeight + 1);
+            gen(this.getSecondarySurfaceBlock(), x, surfaceHeight + 1);
+            gen(this.getDefaultBlock(), x, surfaceHeight + 2);
 
             //trees
             if(this.shouldGenerateTrees()) {
@@ -75,6 +77,7 @@ public abstract class TerrainGenerator {
 
         private final World world;
         private Block surfaceBlock;
+        private Block secondarySurfaceBlock;
         private Block defaultBlock;
         private boolean trees;
 
@@ -84,6 +87,11 @@ public abstract class TerrainGenerator {
 
         public Builder surfaceBlock(Block surfaceBlock) {
             this.surfaceBlock = surfaceBlock;
+            return this;
+        }
+
+        public Builder secondarySurfaceBlock(Block secondarySurfaceBlock) {
+            this.secondarySurfaceBlock = secondarySurfaceBlock;
             return this;
         }
 
@@ -106,6 +114,11 @@ public abstract class TerrainGenerator {
                 @Override
                 public Block getSurfaceBlock() {
                     return surfaceBlock;
+                }
+
+                @Override
+                Block getSecondarySurfaceBlock() {
+                    return secondarySurfaceBlock;
                 }
 
                 @Override
