@@ -1,19 +1,19 @@
 package com.cadenkoehl.minecraft2D.display;
 
-import com.cadenkoehl.minecraft2D.block.Block;
-import com.cadenkoehl.minecraft2D.block.Blocks;
-import com.cadenkoehl.minecraft2D.entities.PlayerEntity;
+import com.cadenkoehl.minecraft2D.entities.Tile;
+import com.cadenkoehl.minecraft2D.entities.mob.LivingEntity;
+import com.cadenkoehl.minecraft2D.entities.mob.PlayerEntity;
+import com.cadenkoehl.minecraft2D.entities.mob.hostile.ZombieEntity;
 import com.cadenkoehl.minecraft2D.physics.Vec2d;
 import com.cadenkoehl.minecraft2D.render.Renderer;
-import com.cadenkoehl.minecraft2D.util.LogLevel;
-import com.cadenkoehl.minecraft2D.util.Logger;
 import com.cadenkoehl.minecraft2D.world.Overworld;
 import com.cadenkoehl.minecraft2D.world.Sky;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.util.ConcurrentModificationException;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class GameWindow extends JPanel {
 
@@ -21,6 +21,8 @@ public class GameWindow extends JPanel {
     public static Graphics GRAPHICS = null;
     public static final Overworld overworld = new Overworld();
     public static PlayerEntity player = null;
+    public static int fps = 60;
+    private static int fpsCounter;
     private final GameFrame FRAME;
     private boolean isRunning;
 
@@ -37,14 +39,28 @@ public class GameWindow extends JPanel {
 
         isRunning = true;
 
+        scheduleFPSTimer();
+
         new Thread(this::startGameLoop, "Game thread").start();
+    }
+
+    private void scheduleFPSTimer() {
+        Timer fpsTimer = new Timer();
+        fpsTimer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                fps = fpsCounter;
+                fpsCounter = 0;
+                scheduleFPSTimer();
+            }
+        }, 1000);
     }
 
     public void startGameLoop() {
         while(this.isRunning) {
             this.tick();
             try {
-                Thread.sleep(1);
+                Thread.sleep(2);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -68,6 +84,10 @@ public class GameWindow extends JPanel {
         GameFrame.HEIGHT = FRAME.getHeight();
         GameFrame.WIDTH = FRAME.getWidth();
 
+        fpsCounter++;
+
+        g.drawString("FPS: " + fps, GameFrame.WIDTH - 50, 10);
+
         if(isRunning) {
             overworld.render();
             player.render();
@@ -83,11 +103,17 @@ public class GameWindow extends JPanel {
             @Override
             public void keyPressed(KeyEvent e) {
                 switch (e.getKeyCode()) {
-                    case KeyEvent.VK_A -> player.setVelocityX(-1);
-                    case KeyEvent.VK_D -> player.setVelocityX(1);
+                    case KeyEvent.VK_A -> {
+                        if(e.isAltDown()) player.setVelocityX(-2);
+                        else player.setVelocityX(-1);
+                    }
+                    case KeyEvent.VK_D -> {
+                        if(e.isAltDown()) player.setVelocityX(2);
+                        else player.setVelocityX(1);
+                    }
                     case KeyEvent.VK_SPACE -> player.jump();
-                    case KeyEvent.VK_K -> player.damage(1);
-                    case KeyEvent.VK_G -> repaint();
+                    case KeyEvent.VK_K -> player.damage(2);
+                    case KeyEvent.VK_Z -> overworld.spawnEntity(new ZombieEntity(new Vec2d(player.pos.x, 1), overworld));
                 }
             }
 
@@ -106,7 +132,12 @@ public class GameWindow extends JPanel {
 
                 switch (e.getButton()) {
                     case MouseEvent.BUTTON3 -> player.placeBlock(pos);
-                    case MouseEvent.BUTTON1 -> player.breakBlock(pos);
+                    case MouseEvent.BUTTON1 -> {
+                        player.breakBlock(pos);
+                        Tile entity = overworld.getEntity(pos);
+
+                        if (entity instanceof LivingEntity) player.tryAttack((LivingEntity) entity);
+                    }
                 }
             }
         });

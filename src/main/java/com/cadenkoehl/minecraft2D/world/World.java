@@ -1,21 +1,19 @@
 package com.cadenkoehl.minecraft2D.world;
 
 import com.cadenkoehl.minecraft2D.block.Block;
-import com.cadenkoehl.minecraft2D.block.Blocks;
 import com.cadenkoehl.minecraft2D.display.GameFrame;
+import com.cadenkoehl.minecraft2D.entities.Tile;
+import com.cadenkoehl.minecraft2D.entities.mob.LivingEntity;
 import com.cadenkoehl.minecraft2D.physics.Vec2d;
 import com.cadenkoehl.minecraft2D.render.Renderer;
-import com.cadenkoehl.minecraft2D.util.LogLevel;
-import com.cadenkoehl.minecraft2D.util.Logger;
 import com.cadenkoehl.minecraft2D.world.gen.TerrainGenerator;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.*;
 
 public abstract class World {
 
     private final List<Block> blocks = new ArrayList<>();
+    private final List<Tile> entities = new ArrayList<>();
 
     public World() {
         this.genSpawnTerrain();
@@ -36,14 +34,41 @@ public abstract class World {
             for(Block block : minedBlocks) {
                 blocks.remove(block);
             }
+            List<Tile> deadEntities = new ArrayList<>();
+            for(Tile entity : entities) {
+                if(entity instanceof LivingEntity) {
+                    if(!((LivingEntity) entity).isAlive()) deadEntities.add(entity);
+                }
+                entity.tick();
+            }
+            for(Tile entity : deadEntities) {
+                entities.remove(entity);
+            }
         }
         catch (ConcurrentModificationException ex) {
-            System.out.println("test");
+            //empty catch block
         }
     }
 
     public void genSpawnTerrain() {
         this.getGenerator().generate();
+    }
+
+    public void spawnEntity(Tile entity) {
+        entities.add(entity);
+        entity.render();
+        entity.updateGraphics();
+    }
+
+    public Tile getEntity(Vec2d pos) {
+        for(Tile entity : entities) {
+            if((entity.pos.x == pos.x || entity.pos.x + 1 == pos.x) && entity.pos.y == pos.y) return entity;
+        }
+        return null;
+    }
+
+    public List<Tile> getEntities() {
+        return entities;
     }
 
     /**
@@ -119,6 +144,9 @@ public abstract class World {
                 if(block.screenPos.x - Renderer.CAMERA.offset.x > -50 && block.screenPos.x - Renderer.CAMERA.offset.x < GameFrame.WIDTH) {
                     block.render();
                 }
+            }
+            for(Tile entity : entities) {
+                entity.render();
             }
         }
         catch (ConcurrentModificationException ex) {

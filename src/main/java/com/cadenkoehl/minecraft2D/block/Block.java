@@ -1,6 +1,10 @@
 package com.cadenkoehl.minecraft2D.block;
 
 import com.cadenkoehl.minecraft2D.entities.Tile;
+import com.cadenkoehl.minecraft2D.entities.item.ItemEntity;
+import com.cadenkoehl.minecraft2D.item.BlockItem;
+import com.cadenkoehl.minecraft2D.item.Item;
+import com.cadenkoehl.minecraft2D.item.ItemStack;
 import com.cadenkoehl.minecraft2D.physics.Vec2d;
 import com.cadenkoehl.minecraft2D.render.Texture;
 import com.cadenkoehl.minecraft2D.world.World;
@@ -9,10 +13,12 @@ public abstract class Block extends Tile {
 
     private boolean canCollide;
     private boolean mined;
+    private final BlockItem blockItem;
 
-    public Block(Vec2d pos, World world) {
-        super(pos, world);
+    public Block(String displayName, Vec2d pos, World world) {
+        super(pos, world, "block", displayName);
         canCollide = true;
+        this.blockItem = new BlockItem(new Item.Settings(displayName), this);
     }
 
     public void setCanCollide(boolean canCollide) {
@@ -29,6 +35,8 @@ public abstract class Block extends Tile {
 
     public void mine() {
         mined = true;
+        //if(blockItem == null) return;
+        //this.getWorld().spawnEntity(new ItemEntity(new ItemStack(blockItem), new Vec2d(pos.x, pos.y), this.getWorld()));
     }
 
     @Override
@@ -39,7 +47,7 @@ public abstract class Block extends Tile {
     public Block copy() {
 
         String displayName = this.getDisplayName();
-        return new Block(pos, getWorld()) {
+        return new Block(displayName, pos, getWorld()) {
             @Override
             public String getDisplayName() {
                 return displayName;
@@ -50,15 +58,5 @@ public abstract class Block extends Tile {
                 return canCollide;
             }
         };
-    }
-
-    @Override
-    public int getCollisionHeight() {
-        return 0;
-    }
-
-    @Override
-    public int getCollisionWidth() {
-        return 0;
     }
 }

@@ -1,7 +1,5 @@
 package com.cadenkoehl.minecraft2D.entities;
 
-import com.cadenkoehl.minecraft2D.block.Block;
-import com.cadenkoehl.minecraft2D.block.LogBlock;
 import com.cadenkoehl.minecraft2D.display.GameWindow;
 import com.cadenkoehl.minecraft2D.physics.Vec2d;
 import com.cadenkoehl.minecraft2D.render.Renderer;
@@ -20,7 +18,8 @@ public abstract class Tile {
     public Vec2d screenPos;
     public Vec2d velocity;
     private World world;
-
+    private final Texture texture;
+    private final String displayName;
     private final String name;
 
     public final int height;
@@ -29,14 +28,16 @@ public abstract class Tile {
     public final int blockWidth;
     public final int blockHeight;
 
-    public Tile(Vec2d pos, World world) {
+    public Tile(Vec2d pos, World world, String textureCategory, String displayName) {
         this.pos = pos;
         if (pos != null) screenPos = Vec2d.toScreenPos(pos);
         this.velocity = new Vec2d(0, 0);
         this.world = world;
-        this.name = this.getDisplayName().toLowerCase().replace(" ", "_");
-        this.height = this.getTexture().getIcon().getIconHeight();
-        this.width = this.getTexture().getIcon().getIconWidth();
+        this.displayName = displayName;
+        this.name = displayName.replace(" ", "_").toLowerCase();
+        this.texture = new Texture("textures/" + textureCategory + "/" + name + ".png");
+        this.height = texture.getIcon().getIconHeight();
+        this.width = texture.getIcon().getIconWidth();
         this.blockHeight = height / BLOCK_SIZE;
         this.blockWidth = width / BLOCK_SIZE;
     }
@@ -74,12 +75,30 @@ public abstract class Tile {
         Renderer.render(this, screenPos.x, screenPos.y);
     }
 
+    public int distanceFrom(Vec2d pos) {
+        int x = this.pos.x - pos.x;
+        int y = this.pos.y - pos.y;
+        return Math.abs(x + y);
+    }
+
+    public int distanceFrom(Tile tile) {
+        return this.distanceFrom(tile.pos);
+    }
+
     public String getName() {
         return name;
     }
 
     public World getWorld() {
         return world;
+    }
+
+    public Texture getTexture() {
+        return texture;
+    }
+
+    public String getDisplayName() {
+        return displayName;
     }
 
     public void setVelocity(Vec2d velocity) {
@@ -162,9 +181,4 @@ public abstract class Tile {
     public int getPosY() {
         return this.pos.y;
     }
-
-    public abstract Texture getTexture();
-    public abstract String getDisplayName();
-    public abstract int getCollisionWidth();
-    public abstract int getCollisionHeight();
 }

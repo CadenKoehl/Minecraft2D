@@ -1,6 +1,7 @@
-package com.cadenkoehl.minecraft2D.entities;
+package com.cadenkoehl.minecraft2D.entities.mob;
 
 import com.cadenkoehl.minecraft2D.block.Block;
+import com.cadenkoehl.minecraft2D.entities.Tile;
 import com.cadenkoehl.minecraft2D.physics.Vec2d;
 import com.cadenkoehl.minecraft2D.world.World;
 
@@ -15,8 +16,8 @@ public abstract class LivingEntity extends Tile {
     private boolean alive;
     private int damageCooldown;
 
-    public LivingEntity(Vec2d pos, World world) {
-        super(pos, world);
+    public LivingEntity(Vec2d pos, World world, String displayName) {
+        super(pos, world, "entities", displayName);
         affectedByGravity = true;
         alive = true;
         damageCooldown = 500;
@@ -25,7 +26,9 @@ public abstract class LivingEntity extends Tile {
     @Override
     public void tick() {
 
-        if(!alive) return;
+        if(!alive) {
+            return;
+        }
 
         super.tick();
 
@@ -87,15 +90,23 @@ public abstract class LivingEntity extends Tile {
         return block.canCollide();
     }
 
-    public boolean hasCollidedWith(Block block) {
+    public boolean hasCollidedWith(Tile entity) {
 
-        int playerWidth = this.getCollisionWidth();
-        int playerHeight = this.getCollisionHeight();
+        int playerWidth = this.getWidth();
+        int playerHeight = this.getHeight();
 
-        return this.screenPos.x < block.screenPos.x + block.getWidth() &&
-                this.screenPos.x + playerWidth > block.screenPos.x &&
-                this.screenPos.y < block.screenPos.y + block.getHeight() &&
-                this.screenPos.y + playerHeight > block.screenPos.y;
+        return this.screenPos.x < entity.screenPos.x + entity.getWidth() &&
+                this.screenPos.x + playerWidth > entity.screenPos.x &&
+                this.screenPos.y < entity.screenPos.y + entity.getHeight() &&
+                this.screenPos.y + playerHeight > entity.screenPos.y;
+    }
+
+    public void moveRight(int amount) {
+        setVelocityX(amount);
+    }
+
+    public void moveLeft(int amount) {
+        setVelocityX(-amount);
     }
 
     public void jump() {
@@ -117,6 +128,40 @@ public abstract class LivingEntity extends Tile {
         }
     }
 
+    public boolean tryAttack(LivingEntity target) {
+
+        if(target == this) return false;
+
+        if(distanceFrom(target) <= getReach()) {
+            if(target.damage(this.getBaseAttackDamage())) {
+                if(target.screenPos.x > this.screenPos.x) {
+                    target.moveRight(3);
+                }
+                if(target.screenPos.x < this.screenPos.x) {
+                    target.moveLeft(3);
+                }
+                target.jump();
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean damage(int amount) {
+        if(damageCooldown < 0) {
+            health = health - amount;
+            if(health < 1) kill();
+            damageCooldown = 350;
+            return true;
+        }
+        return false;
+    }
+
+    public void kill() {
+        alive = false;
+        updateGraphics();
+    }
+
     public boolean isOnGround() {
         return this.getWorld().getBlock(this.pos.x, this.pos.y + 2) != null;
     }
@@ -125,14 +170,8 @@ public abstract class LivingEntity extends Tile {
         return alive;
     }
 
-    @Override
-    public int getCollisionHeight() {
-        return height;
-    }
-
-    @Override
-    public int getCollisionWidth() {
-        return width;
+    public int getReach() {
+        return 6;
     }
 
     @Override
@@ -141,17 +180,5 @@ public abstract class LivingEntity extends Tile {
     }
 
     public abstract int getMaxHealth();
-
-    public void damage(int amount) {
-        if(damageCooldown < 0) {
-            health = health - amount;
-            if(health < 1) kill();
-            damageCooldown = 500;
-        }
-    }
-
-    public void kill() {
-        alive = false;
-        updateGraphics();
-    }
+    public abstract int getBaseAttackDamage();
 }

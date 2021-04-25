@@ -1,4 +1,4 @@
-package com.cadenkoehl.minecraft2D.entities;
+package com.cadenkoehl.minecraft2D.entities.mob;
 
 import com.cadenkoehl.minecraft2D.block.Block;
 import com.cadenkoehl.minecraft2D.block.Blocks;
@@ -14,26 +14,30 @@ public class PlayerEntity extends LivingEntity {
     public Block heldBlock;
 
     public PlayerEntity(String username, Vec2d vec2d, World world) {
-        super(vec2d, world);
+        super(vec2d, world, username);
         HUD = new Hud(this);
         this.originalPos = vec2d;
         this.heldBlock = Blocks.DIRT;
     }
 
     public void placeBlock(Vec2d pos) {
-        Block block = this.heldBlock.copy();
-        this.getWorld().setBlock(block, pos);
-        block.updateGraphics();
+        if(distanceFrom(pos) <= getReach()) {
+            Block block = this.heldBlock.copy();
+            this.getWorld().setBlock(block, pos);
+            block.updateGraphics();
+        }
     }
 
     public void breakBlock(Vec2d pos) {
-        this.getWorld().breakBlock(pos);
+        if(distanceFrom(pos) <= getReach()) {
+            this.getWorld().breakBlock(pos);
+        }
     }
 
     @Override
-    public void damage(int amount) {
-        super.damage(amount);
+    public boolean damage(int amount) {
         HUD.updateHP();
+        return super.damage(amount);
     }
 
     @Override
@@ -55,6 +59,11 @@ public class PlayerEntity extends LivingEntity {
     @Override
     public int getMaxHealth() {
         return 10;
+    }
+
+    @Override
+    public int getBaseAttackDamage() {
+        return 1;
     }
 
     @Override

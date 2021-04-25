@@ -1,5 +1,6 @@
 package com.cadenkoehl.minecraft2D.render;
 
+import com.cadenkoehl.minecraft2D.block.Block;
 import com.cadenkoehl.minecraft2D.entities.Tile;
 import com.cadenkoehl.minecraft2D.util.LogLevel;
 import com.cadenkoehl.minecraft2D.util.Logger;
@@ -11,24 +12,23 @@ import java.util.MissingResourceException;
 
 public class Texture {
 
-    private final ImageIcon icon;
+    private ImageIcon icon;
     private final File file;
     private final String path;
 
-    public Texture(String filePath) {
+    public Texture(String filePath, int sizeMultiplier) {
         this.path = filePath;
         this.file = new File(filePath);
-        this.icon = this.createIcon(filePath);
-
-        if(!this.file.exists()) {
-            throw new IllegalArgumentException(file + " does not exist!");
-        }
+        this.icon = this.createIcon(filePath, sizeMultiplier);
+    }
+    public Texture(String filePath) {
+        this(filePath, Block.SIZE_MULTIPLIER);
     }
 
-    private ImageIcon createIcon(String filePath) {
+    private ImageIcon createIcon(String filePath, int sizeMultiplier) {
         ImageIcon icon = new ImageIcon(filePath);
 
-        Image scaledImage = icon.getImage().getScaledInstance(icon.getIconWidth() * Tile.SIZE_MULTIPLIER, icon.getIconHeight() * Tile.SIZE_MULTIPLIER, Image.SCALE_SMOOTH);
+        Image scaledImage = icon.getImage().getScaledInstance(icon.getIconWidth() * sizeMultiplier, icon.getIconHeight() * sizeMultiplier, Image.SCALE_SMOOTH);
         return new ImageIcon(scaledImage);
     }
 

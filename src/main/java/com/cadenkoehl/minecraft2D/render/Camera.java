@@ -1,7 +1,7 @@
 package com.cadenkoehl.minecraft2D.render;
 
 import com.cadenkoehl.minecraft2D.display.GameFrame;
-import com.cadenkoehl.minecraft2D.entities.PlayerEntity;
+import com.cadenkoehl.minecraft2D.entities.mob.PlayerEntity;
 import com.cadenkoehl.minecraft2D.physics.Vec2d;
 
 public class Camera {

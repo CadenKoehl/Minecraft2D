@@ -1,6 +1,6 @@
 package com.cadenkoehl.minecraft2D.display;
 
-import com.cadenkoehl.minecraft2D.entities.PlayerEntity;
+import com.cadenkoehl.minecraft2D.entities.mob.PlayerEntity;
 import com.cadenkoehl.minecraft2D.render.Renderer;
 import com.cadenkoehl.minecraft2D.render.Texture;
 
