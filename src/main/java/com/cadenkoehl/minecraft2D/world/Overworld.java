@@ -17,6 +17,7 @@ public class Overworld extends World {
                 .secondarySurfaceBlock(Blocks.DIRT)
                 .defaultBlock(Blocks.STONE)
                 .addTrees()
+                .addCarvers()
                 .build();
     }
 }

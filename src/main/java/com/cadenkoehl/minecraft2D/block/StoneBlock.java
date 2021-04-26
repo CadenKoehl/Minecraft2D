@@ -8,4 +8,9 @@ public class StoneBlock extends Block {
     public StoneBlock(Vec2d pos, World world) {
         super("Stone", pos, world);
     }
+
+    @Override
+    public Block getBlockBehind() {
+        return Blocks.BACKGROUND_STONE;
+    }
 }

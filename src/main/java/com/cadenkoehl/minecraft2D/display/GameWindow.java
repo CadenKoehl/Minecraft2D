@@ -2,7 +2,7 @@ package com.cadenkoehl.minecraft2D.display;
 
 import com.cadenkoehl.minecraft2D.entities.Tile;
 import com.cadenkoehl.minecraft2D.entities.mob.LivingEntity;
-import com.cadenkoehl.minecraft2D.entities.mob.PlayerEntity;
+import com.cadenkoehl.minecraft2D.entities.player.PlayerEntity;
 import com.cadenkoehl.minecraft2D.entities.mob.hostile.ZombieEntity;
 import com.cadenkoehl.minecraft2D.physics.Vec2d;
 import com.cadenkoehl.minecraft2D.render.Renderer;
@@ -21,7 +21,10 @@ public class GameWindow extends JPanel {
     public static Graphics GRAPHICS = null;
     public static final Overworld overworld = new Overworld();
     public static PlayerEntity player = null;
+    public static boolean readyForNextFrame = true;
+    public static Hud hud;
     public static int fps = 60;
+    public static int delay = 2;
     private static int fpsCounter;
     private final GameFrame FRAME;
     private boolean isRunning;
@@ -34,6 +37,8 @@ public class GameWindow extends JPanel {
         this.setFocusable(true);
 
         player = new PlayerEntity("Player", new Vec2d(10, 1), overworld);
+
+        hud = new Hud(player);
 
         setUpInput();
 
@@ -58,6 +63,7 @@ public class GameWindow extends JPanel {
 
     public void startGameLoop() {
         while(this.isRunning) {
+            readyForNextFrame = false;
             this.tick();
             try {
                 Thread.sleep(2);
@@ -75,6 +81,7 @@ public class GameWindow extends JPanel {
         if(!player.isAlive()) {
             isRunning = false;
         }
+        repaint();
     }
 
     @Override
@@ -86,11 +93,10 @@ public class GameWindow extends JPanel {
 
         fpsCounter++;
 
-        g.drawString("FPS: " + fps, GameFrame.WIDTH - 50, 10);
-
         if(isRunning) {
             overworld.render();
             player.render();
+            hud.update();
         }
         else {
             g.setFont(new Font("Courier", Font.BOLD, 60));
@@ -114,6 +120,8 @@ public class GameWindow extends JPanel {
                     case KeyEvent.VK_SPACE -> player.jump();
                     case KeyEvent.VK_K -> player.damage(2);
                     case KeyEvent.VK_Z -> overworld.spawnEntity(new ZombieEntity(new Vec2d(player.pos.x, 1), overworld));
+                    case KeyEvent.VK_T -> overworld.generator.nextChunk();
+                    case KeyEvent.VK_F3 -> Hud.f3 = !Hud.f3;
                 }
             }
 
@@ -133,10 +141,13 @@ public class GameWindow extends JPanel {
                 switch (e.getButton()) {
                     case MouseEvent.BUTTON3 -> player.placeBlock(pos);
                     case MouseEvent.BUTTON1 -> {
-                        player.breakBlock(pos);
                         Tile entity = overworld.getEntity(pos);
 
-                        if (entity instanceof LivingEntity) player.tryAttack((LivingEntity) entity);
+                        if (entity instanceof LivingEntity) {
+                            player.tryAttack((LivingEntity) entity);
+                            return;
+                        }
+                        player.breakBlock(pos);
                     }
                 }
             }

@@ -1,8 +1,8 @@
 package com.cadenkoehl.minecraft2D.world;
 
 import com.cadenkoehl.minecraft2D.block.Block;
-import com.cadenkoehl.minecraft2D.block.StoneBlock;
 import com.cadenkoehl.minecraft2D.display.GameFrame;
+import com.cadenkoehl.minecraft2D.display.GameWindow;
 import com.cadenkoehl.minecraft2D.entities.Tile;
 import com.cadenkoehl.minecraft2D.entities.mob.LivingEntity;
 import com.cadenkoehl.minecraft2D.physics.Vec2d;
@@ -15,6 +15,8 @@ public abstract class World {
 
     private final List<Block> blocks = new ArrayList<>();
     private final List<Tile> entities = new ArrayList<>();
+    public final TerrainGenerator generator = getGenerator();
+    public int width;
 
     public World() {
         this.genSpawnTerrain();
@@ -35,6 +37,7 @@ public abstract class World {
             for(Block block : minedBlocks) {
                 blocks.remove(block);
             }
+
             List<Tile> deadEntities = new ArrayList<>();
             for(Tile entity : entities) {
                 if(entity instanceof LivingEntity) {
@@ -52,7 +55,7 @@ public abstract class World {
     }
 
     public void genSpawnTerrain() {
-        this.getGenerator().generate();
+        generator.genSpawn();
     }
 
     public void spawnEntity(Tile entity) {
@@ -104,10 +107,20 @@ public abstract class World {
     public void setBlock(Block block, boolean canCollide) {
         block = block.copy();
         block.setWorld(this);
+        block.setCanCollide(canCollide);
         if(block.pos == null) throw new IllegalStateException("Block has no state yet!");
         if(this.getBlock(block.pos.x, block.pos.y) == null) {
             blocks.add(block);
         }
+    }
+
+    public void replaceBlock(Block block, boolean canCollide) {
+        blocks.remove(getBlock(block.pos));
+        setBlock(block, canCollide);
+    }
+
+    public void replaceBlock(Block block) {
+        replaceBlock(block, true);
     }
 
     public void setBlock(Block block) {
@@ -136,7 +149,9 @@ public abstract class World {
         }
         if(brokeBlock == null) return;
 
-        brokeBlock.mine();
+        if(brokeBlock.canBeMined()) {
+            brokeBlock.mine();
+        }
     }
 
     public void render() {
@@ -149,9 +164,10 @@ public abstract class World {
     }
     private void renderBlocks() {
         for(Block block : blocks) {
-            if(block.screenPos.x - Renderer.CAMERA.offset.x > -50 && block.screenPos.x - Renderer.CAMERA.offset.x < GameFrame.WIDTH
-            && block.screenPos.y - Renderer.CAMERA.offset.y > -50 && block.screenPos.y - Renderer.CAMERA.offset.y < GameFrame.HEIGHT) {
-                block.render();
+            if(block.screenPos.x - Renderer.CAMERA.offset.x > -50 && block.screenPos.x - Renderer.CAMERA.offset.x < GameFrame.WIDTH) {
+                if(block.screenPos.y - Renderer.CAMERA.offset.y > -50 && block.screenPos.y - Renderer.CAMERA.offset.y < GameFrame.HEIGHT) {
+                    block.render();
+                }
             }
         }
         for(Tile entity : entities) {

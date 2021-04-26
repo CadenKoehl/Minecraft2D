@@ -1,7 +1,6 @@
 package com.cadenkoehl.minecraft2D.render;
 
-import com.cadenkoehl.minecraft2D.display.GameFrame;
-import com.cadenkoehl.minecraft2D.entities.mob.PlayerEntity;
+import com.cadenkoehl.minecraft2D.entities.player.PlayerEntity;
 import com.cadenkoehl.minecraft2D.physics.Vec2d;
 
 public class Camera {
@@ -14,14 +13,8 @@ public class Camera {
 
     public void centerOn(PlayerEntity player) {
         if(this.offset.x == player.screenPos.x && this.offset.y == player.screenPos.y) return;
-        if(player.screenPos.y > GameFrame.HEIGHT) {
-            Renderer.repaint();
-            return;
-        }
 
         this.offset.x = player.screenPos.x - 470;
         this.offset.y = player.screenPos.y - 380;
-
-        Renderer.repaint();
     }
 }

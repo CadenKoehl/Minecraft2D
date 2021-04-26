@@ -38,14 +38,15 @@ public abstract class LivingEntity extends Tile {
         if(affectedByGravity) {
             setVelocityY(1);
         }
-        if(this.screenPos.y > 2000) {
-            this.damage(1);
-        }
     }
 
     protected void updatePosX(){
+
         //Moving right
         if(velocity.x > 0) {
+
+            if(this.pos.x > getWorld().width - 2) return;
+
             if(!collisionWithBlock(this.pos.x + 1, this.pos.y)) {
                 if(!collisionWithBlock(this.pos.x + 1, this.pos.y + 1)) {
                     setScreenPosX(screenPos.x + velocity.x);
@@ -56,6 +57,9 @@ public abstract class LivingEntity extends Tile {
         }
         //Moving left
         if(velocity.x < 0) {
+
+            if(this.pos.x < 1) return;
+
             if(!collisionWithBlock(this.pos.x, this.pos.y)) {
                 if(!collisionWithBlock(this.pos.x, this.pos.y + 1)) {
                     setScreenPosX(screenPos.x + velocity.x);

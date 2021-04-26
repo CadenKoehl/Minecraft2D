@@ -1,5 +1,6 @@
 package com.cadenkoehl.minecraft2D.entities;
 
+import com.cadenkoehl.minecraft2D.display.GameFrame;
 import com.cadenkoehl.minecraft2D.display.GameWindow;
 import com.cadenkoehl.minecraft2D.physics.Vec2d;
 import com.cadenkoehl.minecraft2D.render.Renderer;
@@ -44,10 +45,11 @@ public abstract class Tile {
 
     public void tick() {
 
+        if(!this.inFrame()) return;
+
         if (pos == null || world == null) return;
 
         syncPos();
-        //applyGravity();
 
         if (velocity.x == 0 && velocity.y == 0) return;
 
@@ -57,6 +59,13 @@ public abstract class Tile {
     public void updatePos() {
         updatePosX();
         updatePosY();
+    }
+
+    public boolean inFrame() {
+        return this.screenPos.y - Renderer.CAMERA.offset.y > -50 &&
+                this.screenPos.y - Renderer.CAMERA.offset.y < 570 &&
+                this.screenPos.x - Renderer.CAMERA.offset.x > -50 &&
+                this.screenPos.x - Renderer.CAMERA.offset.x < GameFrame.WIDTH;
     }
 
     protected void updatePosX(){
@@ -72,7 +81,9 @@ public abstract class Tile {
     }
 
     public void render() {
-        Renderer.render(this, screenPos.x, screenPos.y);
+        if(this.inFrame()) {
+            Renderer.render(this, screenPos.x, screenPos.y);
+        }
     }
 
     public int distanceFrom(Vec2d pos) {
@@ -145,12 +156,6 @@ public abstract class Tile {
         screenPos = Vec2d.toScreenPos(pos);
     }
 
-    private void applyGravity() {
-        if(this.isAffectedByGravity()) {
-            setVelocityY(1);
-        }
-    }
-
     public boolean isAffectedByGravity() {
         return false;
     }
@@ -171,7 +176,6 @@ public abstract class Tile {
         if(screenPos == null) {
             screenPos = Vec2d.toScreenPos(pos);
         }
-        GameWindow.INSTANCE.repaint(screenPos.x, screenPos.y, width, height);
     }
 
     public int getPosX() {

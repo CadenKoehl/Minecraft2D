@@ -1,10 +1,8 @@
 package com.cadenkoehl.minecraft2D.block;
 
 import com.cadenkoehl.minecraft2D.entities.Tile;
-import com.cadenkoehl.minecraft2D.entities.item.ItemEntity;
 import com.cadenkoehl.minecraft2D.item.BlockItem;
 import com.cadenkoehl.minecraft2D.item.Item;
-import com.cadenkoehl.minecraft2D.item.ItemStack;
 import com.cadenkoehl.minecraft2D.physics.Vec2d;
 import com.cadenkoehl.minecraft2D.render.Texture;
 import com.cadenkoehl.minecraft2D.world.World;
@@ -33,12 +31,19 @@ public abstract class Block extends Tile {
         return true;
     }
 
+    public Block getBlockBehind() {
+        return null;
+    }
+
     public boolean isMined() {
         return mined;
     }
 
     public void mine() {
-        mined = true;
+        if(canBeMined()) {
+            mined = true;
+        }
+
         //if(blockItem == null) return;
         //this.getWorld().spawnEntity(new ItemEntity(new ItemStack(blockItem), new Vec2d(pos.x, pos.y), this.getWorld()));
     }
@@ -49,7 +54,6 @@ public abstract class Block extends Tile {
     }
 
     public Block copy() {
-
         String displayName = this.getDisplayName();
         return new Block(displayName, pos, getWorld()) {
             @Override
@@ -60,6 +64,16 @@ public abstract class Block extends Tile {
             @Override
             public boolean canCollide() {
                 return canCollide;
+            }
+
+            @Override
+            public boolean canBeMined() {
+                return Block.this.canBeMined();
+            }
+
+            @Override
+            public Block getBlockBehind() {
+                return Block.this.getBlockBehind();
             }
         };
     }

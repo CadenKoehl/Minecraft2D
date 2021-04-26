@@ -5,6 +5,8 @@ import com.cadenkoehl.minecraft2D.block.Blocks;
 import com.cadenkoehl.minecraft2D.display.GameFrame;
 import com.cadenkoehl.minecraft2D.entities.Tile;
 import com.cadenkoehl.minecraft2D.physics.Vec2d;
+import com.cadenkoehl.minecraft2D.util.LogLevel;
+import com.cadenkoehl.minecraft2D.util.Logger;
 import com.cadenkoehl.minecraft2D.world.World;
 
 public abstract class TerrainGenerator {
@@ -14,18 +16,29 @@ public abstract class TerrainGenerator {
     abstract Block getSecondarySurfaceBlock();
     abstract Block getDefaultBlock();
     abstract boolean shouldGenerateTrees();
+    abstract boolean shouldGenerateCaves();
 
-    private final int surfaceHeight = GameFrame.HEIGHT / Tile.BLOCK_SIZE - 2;
+    public final int surfaceHeight = GameFrame.HEIGHT / Tile.BLOCK_SIZE - 2;
     private final World world = this.getWorld();
+    private int chunks = 0;
 
-    public void generate() {
+    public void genSpawn() {
+        Logger.log(LogLevel.INFO, "Generating level...");
+        genChunk(0);
+        Logger.log(LogLevel.INFO, "Done!");
+    }
 
-        for(int x = 0; x < GameFrame.WIDTH / Block.BLOCK_SIZE + 500; x++) {
+    public void nextChunk() {
+        genChunk(chunks);
+    }
 
+    public void genChunk(int chunkX) {
+        chunkX = chunkX * 16;
+        for(int x = chunkX; x < chunkX + 16; x++) {
             //surface
             gen(this.getSurfaceBlock(), x, surfaceHeight);
             gen(this.getSecondarySurfaceBlock(), x, surfaceHeight + 1);
-            gen(this.getDefaultBlock(), x, surfaceHeight + 2);
+            genDefaultBlocks(x);
 
             //trees
             if(this.shouldGenerateTrees()) {
@@ -34,6 +47,8 @@ public abstract class TerrainGenerator {
                 }
             }
         }
+        chunks++;
+        world.width = world.width + 16;
     }
 
     private void genTree(int x, int y) {
@@ -53,6 +68,12 @@ public abstract class TerrainGenerator {
         gen(Blocks.LEAF_BLOCK, x, y - 6, false);
     }
 
+    private void genDefaultBlocks(int x) {
+        for(int y = 2; y < 10; y++) {
+            gen(this.getDefaultBlock(), x, surfaceHeight + y);
+        }
+    }
+
     private void gen(Block block, int x, int y, boolean canCollide) {
         World world = this.getWorld();
         Block blockCopy = block.copy();
@@ -64,6 +85,19 @@ public abstract class TerrainGenerator {
         gen(block, x, y, true);
     }
 
+    private void cave(int x) {
+        replace(Blocks.BACKGROUND_STONE, x, surfaceHeight + 4, false);
+        replace(Blocks.BACKGROUND_STONE, x, surfaceHeight + 5, false);
+        replace(Blocks.BACKGROUND_STONE, x, surfaceHeight + 6, false);
+    }
+
+    private void replace(Block block, int x, int y, boolean canCollide) {
+        Block blockCopy = block.copy();
+        blockCopy.setCanCollide(canCollide);
+        blockCopy.setPos(new Vec2d(x, y));
+        world.replaceBlock(blockCopy);
+    }
+
     /**
      * @param chance The probability that this method will return true
      * @return true or false
@@ -73,6 +107,10 @@ public abstract class TerrainGenerator {
         return random == 1;
     }
 
+    public int getChunks() {
+        return chunks;
+    }
+
     public static class Builder {
 
         private final World world;
@@ -80,6 +118,7 @@ public abstract class TerrainGenerator {
         private Block secondarySurfaceBlock;
         private Block defaultBlock;
         private boolean trees;
+        private boolean caves;
 
         public Builder(World world) {
             this.world = world;
@@ -102,6 +141,11 @@ public abstract class TerrainGenerator {
 
         public Builder addTrees() {
             this.trees = true;
+            return this;
+        }
+
+        public Builder addCarvers() {
+            this.caves = true;
             return this;
         }
 
@@ -129,6 +173,11 @@ public abstract class TerrainGenerator {
                 @Override
                 public boolean shouldGenerateTrees() {
                     return trees;
+                }
+
+                @Override
+                boolean shouldGenerateCaves() {
+                    return caves;
                 }
             };
         }
