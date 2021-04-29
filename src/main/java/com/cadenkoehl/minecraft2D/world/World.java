@@ -1,29 +1,63 @@
 package com.cadenkoehl.minecraft2D.world;
 
 import com.cadenkoehl.minecraft2D.block.Block;
+import com.cadenkoehl.minecraft2D.block.LogBlock;
 import com.cadenkoehl.minecraft2D.display.GameFrame;
-import com.cadenkoehl.minecraft2D.display.GameWindow;
 import com.cadenkoehl.minecraft2D.entities.Tile;
 import com.cadenkoehl.minecraft2D.entities.mob.LivingEntity;
 import com.cadenkoehl.minecraft2D.physics.Vec2d;
 import com.cadenkoehl.minecraft2D.render.Renderer;
+import com.cadenkoehl.minecraft2D.util.TimeUtil;
 import com.cadenkoehl.minecraft2D.world.gen.TerrainGenerator;
 
+import java.awt.*;
 import java.util.*;
+import java.util.List;
 
 public abstract class World {
 
-    private final List<Block> blocks = new ArrayList<>();
-    private final List<Tile> entities = new ArrayList<>();
-    public final TerrainGenerator generator = getGenerator();
+    private final List<Block> blocks;
+    private final List<Tile> entities;
+    private final Sun sun;
+    public final TerrainGenerator generator;
     public int width;
+    public int time;
+    public int days;
+    private static final int sunTravelLength = GameFrame.WIDTH * 2;
+    private static final int dayLength = 200;
+    private int skyColorAlpha;
+    public Color skyColor;
 
     public World() {
+        this.blocks = new ArrayList<>();
+        this.entities = new ArrayList<>();
+        this.generator = this.getGenerator();
+        this.sun = new Sun(0, 200, 100, 100);
+        time = 0;
+        days = 1;
         this.genSpawnTerrain();
+        if(this.hasDaylightCycle()) {
+            TimeUtil.scheduleTask(this::updateDaylightCycle, dayLength);
+        }
+        skyColorAlpha = 255;
+        updateSkyColor();
+    }
+
+    private void updateSkyColor() {
+
+        if(time > (sunTravelLength / 2) - (sunTravelLength / 6) && skyColorAlpha > 10) {
+            skyColorAlpha--;
+        }
+        if(time < sunTravelLength / 4 && skyColorAlpha < 255) {
+            skyColorAlpha++;
+        }
+
+        skyColor = new Color(150, 212, 246, skyColorAlpha);
     }
 
     public abstract String getDisplayName();
     public abstract TerrainGenerator getGenerator();
+    public abstract boolean hasDaylightCycle();
 
     public void tick() {
         try {
@@ -52,6 +86,25 @@ public abstract class World {
         catch (ConcurrentModificationException ex) {
             //empty catch block
         }
+    }
+
+    private void updateDaylightCycle() {
+        updateSkyColor();
+        time++;
+        if(time > sunTravelLength) {
+            time = -100;
+            days++;
+        }
+        sun.pos.x = time;
+        TimeUtil.scheduleTask(this::updateDaylightCycle, dayLength);
+    }
+
+    public boolean isNight() {
+        return time > sunTravelLength / 2;
+    }
+
+    public boolean isDay() {
+        return !isNight() && this.hasDaylightCycle();
     }
 
     public void genSpawnTerrain() {
@@ -156,10 +209,14 @@ public abstract class World {
 
     public void render() {
         try {
+            sun.render();
             renderBlocks();
+            renderEntities();
         }
         catch (ConcurrentModificationException ex) {
+            sun.render();
             renderBlocks();
+            renderEntities();
         }
     }
     private void renderBlocks() {
@@ -170,6 +227,8 @@ public abstract class World {
                 }
             }
         }
+    }
+    private void renderEntities() {
         for(Tile entity : entities) {
             entity.render();
         }

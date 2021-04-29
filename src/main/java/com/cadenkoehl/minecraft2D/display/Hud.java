@@ -4,9 +4,6 @@ import com.cadenkoehl.minecraft2D.entities.player.PlayerEntity;
 import com.cadenkoehl.minecraft2D.render.Renderer;
 import com.cadenkoehl.minecraft2D.render.Texture;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import static com.cadenkoehl.minecraft2D.display.GameWindow.*;
 
 public class Hud {
@@ -26,18 +23,19 @@ public class Hud {
     }
 
     private void updateHP() {
-        for(int i = 1; i < player.health; i++) {
+        for(int i = 1; i <= player.health; i++) {
             Renderer.render(HEART, i * 20, 10);
         }
     }
 
     private void updateF3() {
         if(f3) {
-            GRAPHICS.drawString("FPS: " + fps, 25, 50);
-            GRAPHICS.drawString("X: " + player.pos.x, 25, 70);
-            GRAPHICS.drawString("Y: " + ((-player.pos.y) + 10), 25, 90);
-            GRAPHICS.drawString("B: " + overworld.getBlocks().size(), 25, 110);
-            GRAPHICS.drawString("E: " + overworld.getEntities().size(), 25, 130);
+            GRAPHICS.drawString("fps: " + fps, 25, 50);
+            GRAPHICS.drawString("x: " + player.pos.x, 25, 70);
+            GRAPHICS.drawString("y: " + ((-player.pos.y) + 10), 25, 90);
+            GRAPHICS.drawString("blocks: " + overworld.getBlocks().size(), 25, 110);
+            GRAPHICS.drawString("entities: " + (overworld.getEntities().size() + 1), 25, 130);
+            GRAPHICS.drawString("day " + (overworld.days), 25, 150);
         }
     }
 }

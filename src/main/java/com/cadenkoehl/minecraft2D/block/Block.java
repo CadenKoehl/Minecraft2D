@@ -19,12 +19,18 @@ public abstract class Block extends Tile {
         this.blockItem = new BlockItem(new Item.Settings(displayName), this);
     }
 
+    public Block(String displayName, Vec2d pos, World world, boolean canCollide) {
+        super(pos, world, "block", displayName);
+        this.canCollide = canCollide;
+        this.blockItem = new BlockItem(new Item.Settings(displayName), this);
+    }
+
     public void setCanCollide(boolean canCollide) {
         this.canCollide = canCollide;
     }
 
     public boolean canCollide() {
-        return canCollide;
+        return this.canCollide;
     }
 
     public boolean canBeMined() {
@@ -55,15 +61,10 @@ public abstract class Block extends Tile {
 
     public Block copy() {
         String displayName = this.getDisplayName();
-        return new Block(displayName, pos, getWorld()) {
+        return new Block(displayName, pos, getWorld(), this.canCollide) {
             @Override
             public String getDisplayName() {
                 return displayName;
-            }
-
-            @Override
-            public boolean canCollide() {
-                return canCollide;
             }
 
             @Override

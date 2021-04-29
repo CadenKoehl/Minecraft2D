@@ -1,7 +1,6 @@
 package com.cadenkoehl.minecraft2D.entities;
 
 import com.cadenkoehl.minecraft2D.display.GameFrame;
-import com.cadenkoehl.minecraft2D.display.GameWindow;
 import com.cadenkoehl.minecraft2D.physics.Vec2d;
 import com.cadenkoehl.minecraft2D.render.Renderer;
 import com.cadenkoehl.minecraft2D.render.Texture;

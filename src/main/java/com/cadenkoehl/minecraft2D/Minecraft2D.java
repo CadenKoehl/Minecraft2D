@@ -1,13 +1,29 @@
 package com.cadenkoehl.minecraft2D;
 
-import com.cadenkoehl.minecraft2D.display.GameFrame;
+import com.cadenkoehl.minecraft2D.render.Texture;
 
-public class Minecraft2D {
+import java.awt.*;
+
+public class Minecraft2D extends Game {
 
     public static final String TITLE = "Minecraft 2D";
-    public static String USERNAME;
+    public static final Texture LOGO = new Texture("textures/logo.png", -10);
 
-    public static void main(String[] args) {
-        new GameFrame();
+    @Override
+    public void init() {
+    }
+
+    @Override
+    public void tick() {
+
+    }
+
+    @Override
+    public void renderFrame(Graphics g) {
+    }
+
+    @Override
+    public void stop() {
+
     }
 }

@@ -8,21 +8,27 @@ import com.cadenkoehl.minecraft2D.physics.Vec2d;
 import com.cadenkoehl.minecraft2D.util.LogLevel;
 import com.cadenkoehl.minecraft2D.util.Logger;
 import com.cadenkoehl.minecraft2D.world.World;
+import com.cadenkoehl.minecraft2D.world.biome.Biome;
+import com.cadenkoehl.minecraft2D.world.gen.feature.ConfiguredFeature;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public abstract class TerrainGenerator {
 
     abstract World getWorld();
-    abstract Block getSurfaceBlock();
-    abstract Block getSecondarySurfaceBlock();
     abstract Block getDefaultBlock();
-    abstract boolean shouldGenerateTrees();
+    abstract List<Biome> getBiomes();
     abstract boolean shouldGenerateCaves();
 
     public final int surfaceHeight = GameFrame.HEIGHT / Tile.BLOCK_SIZE - 2;
     private final World world = this.getWorld();
-    private int chunks = 0;
+    private int chunks;
+    private Biome currentBiome;
+    private int chunksInCurrentBiome;
 
     public void genSpawn() {
+        currentBiome = getBiomes().get(0);
         Logger.log(LogLevel.INFO, "Generating level...");
         genChunk(0);
         Logger.log(LogLevel.INFO, "Done!");
@@ -33,39 +39,49 @@ public abstract class TerrainGenerator {
     }
 
     public void genChunk(int chunkX) {
+        chunksInCurrentBiome++;
+        nextBiome();
         chunkX = chunkX * 16;
+
         for(int x = chunkX; x < chunkX + 16; x++) {
             //surface
-            gen(this.getSurfaceBlock(), x, surfaceHeight);
-            gen(this.getSecondarySurfaceBlock(), x, surfaceHeight + 1);
+            gen(currentBiome.getSurfaceBlock(), x, surfaceHeight);
+            gen(currentBiome.getSecondarySurfaceBlock(), x, surfaceHeight + 1);
             genDefaultBlocks(x);
 
-            //trees
-            if(this.shouldGenerateTrees()) {
-                if(x % 10 == 0) {
-                    if(random(3)) genTree(x, surfaceHeight);
-                }
+            if(x % 16 == 0) {
+                genFeatures(x);
             }
         }
         chunks++;
         world.width = world.width + 16;
     }
 
-    private void genTree(int x, int y) {
+    public void genFeatures(int x) {
+        if(currentBiome.getFeatures() == null) return;
 
-        gen(Blocks.LOG, x, y, false);
-        gen(Blocks.LOG, x, y - 1, false);
-        gen(Blocks.LOG, x, y - 2, false);
-        gen(Blocks.LOG, x, y - 3, false);
-        gen(Blocks.LEAF_BLOCK, x, y - 4, false);
-        gen(Blocks.LEAF_BLOCK, x + 1, y - 4, false);
-        gen(Blocks.LEAF_BLOCK, x + 1, y - 5);
-        gen(Blocks.LEAF_BLOCK, x - 1, y - 5, false);
-        gen(Blocks.LEAF_BLOCK, x + 2, y - 4);
-        gen(Blocks.LEAF_BLOCK, x - 1, y - 4);
-        gen(Blocks.LEAF_BLOCK, x - 2, y - 4);
-        gen(Blocks.LEAF_BLOCK, x, y - 5);
-        gen(Blocks.LEAF_BLOCK, x, y - 6, false);
+        for(ConfiguredFeature feature : currentBiome.getFeatures()) {
+            if(random(feature.rarity() + 1)) {
+                feature.generate(x, surfaceHeight, world);
+            }
+        }
+    }
+
+    private void nextBiome() {
+
+        if(chunksInCurrentBiome < 4) return;
+        if(!random(2)) return;
+
+        for(Biome biome : this.getBiomes()) {
+            if(biome == currentBiome) continue;
+            if(random(biome.rarity() + 1)) {
+                currentBiome = biome;
+                chunksInCurrentBiome = 0;
+                return;
+            }
+        }
+        chunksInCurrentBiome = 0;
+        currentBiome = this.getBiomes().get(0);
     }
 
     private void genDefaultBlocks(int x) {
@@ -114,24 +130,13 @@ public abstract class TerrainGenerator {
     public static class Builder {
 
         private final World world;
-        private Block surfaceBlock;
-        private Block secondarySurfaceBlock;
         private Block defaultBlock;
-        private boolean trees;
+        private final List<Biome> biomes;
         private boolean caves;
 
         public Builder(World world) {
             this.world = world;
-        }
-
-        public Builder surfaceBlock(Block surfaceBlock) {
-            this.surfaceBlock = surfaceBlock;
-            return this;
-        }
-
-        public Builder secondarySurfaceBlock(Block secondarySurfaceBlock) {
-            this.secondarySurfaceBlock = secondarySurfaceBlock;
-            return this;
+            biomes = new ArrayList<>();
         }
 
         public Builder defaultBlock(Block defaultBlock) {
@@ -139,8 +144,8 @@ public abstract class TerrainGenerator {
             return this;
         }
 
-        public Builder addTrees() {
-            this.trees = true;
+        public Builder addBiome(Biome biome) {
+            biomes.add(biome);
             return this;
         }
 
@@ -155,15 +160,6 @@ public abstract class TerrainGenerator {
                 public World getWorld() {
                     return world;
                 }
-                @Override
-                public Block getSurfaceBlock() {
-                    return surfaceBlock;
-                }
-
-                @Override
-                Block getSecondarySurfaceBlock() {
-                    return secondarySurfaceBlock;
-                }
 
                 @Override
                 public Block getDefaultBlock() {
@@ -171,10 +167,10 @@ public abstract class TerrainGenerator {
                 }
 
                 @Override
-                public boolean shouldGenerateTrees() {
-                    return trees;
+                List<Biome> getBiomes() {
+                    return biomes;
                 }
-
+                
                 @Override
                 boolean shouldGenerateCaves() {
                     return caves;

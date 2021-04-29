@@ -37,6 +37,11 @@ public class PlayerEntity extends LivingEntity {
     }
 
     @Override
+    public int getMaxDamageCooldown() {
+        return 400;
+    }
+
+    @Override
     public void render() {
         super.render();
     }

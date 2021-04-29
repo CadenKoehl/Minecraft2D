@@ -10,9 +10,7 @@ public class GameFrame extends JFrame {
     public static int HEIGHT = 600;
 
     public GameFrame() {
-        this.add(new GameWindow(this));
         this.setSettings();
-        this.setVisible(true);
     }
 
     public void setSettings() {

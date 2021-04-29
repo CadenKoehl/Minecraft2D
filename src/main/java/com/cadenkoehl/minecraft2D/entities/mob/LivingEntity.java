@@ -16,12 +16,14 @@ public abstract class LivingEntity extends Tile {
     private boolean affectedByGravity;
     private boolean alive;
     private int damageCooldown;
+    private int healCooldown;
 
     public LivingEntity(Vec2d pos, World world, String displayName) {
         super(pos, world, "entities", displayName);
         affectedByGravity = true;
         alive = true;
-        damageCooldown = 500;
+        damageCooldown = this.getMaxDamageCooldown();
+        healCooldown = 10000;
     }
 
     @Override
@@ -34,9 +36,20 @@ public abstract class LivingEntity extends Tile {
         super.tick();
 
         damageCooldown--;
+        healCooldown--;
 
         if(affectedByGravity) {
             setVelocityY(1);
+        }
+        if(healCooldown < 0) {
+            healCooldown = 10000;
+            heal();
+        }
+    }
+
+    public void heal() {
+        if(health < getMaxHealth()) {
+            health++;
         }
     }
 
@@ -160,7 +173,7 @@ public abstract class LivingEntity extends Tile {
         if(damageCooldown < 0) {
             health = health - amount;
             if(health < 1) kill();
-            damageCooldown = 350;
+            damageCooldown = this.getMaxDamageCooldown();
             return true;
         }
         return false;
@@ -186,6 +199,10 @@ public abstract class LivingEntity extends Tile {
     @Override
     public boolean isAffectedByGravity() {
         return true;
+    }
+
+    public int getMaxDamageCooldown() {
+        return 200;
     }
 
     public abstract int getMaxHealth();
