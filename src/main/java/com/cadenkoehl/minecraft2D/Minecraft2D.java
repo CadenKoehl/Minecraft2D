@@ -1,8 +1,13 @@
 package com.cadenkoehl.minecraft2D;
 
+import com.cadenkoehl.minecraft2D.display.*;
+import com.cadenkoehl.minecraft2D.entities.player.PlayerEntity;
+import com.cadenkoehl.minecraft2D.item.crafting.Recipes;
+import com.cadenkoehl.minecraft2D.physics.Vec2d;
+import com.cadenkoehl.minecraft2D.render.Renderer;
 import com.cadenkoehl.minecraft2D.render.Texture;
-
-import java.awt.*;
+import com.cadenkoehl.minecraft2D.world.Overworld;
+import jdk.swing.interop.SwingInterOpUtils;
 
 public class Minecraft2D extends Game {
 
@@ -11,15 +16,30 @@ public class Minecraft2D extends Game {
 
     @Override
     public void init() {
+        Thread.currentThread().setName("Initialization thread");
+
+        Recipes.registerRecipes();
+
+        state = GameState.GAME;
+
+        overworld = new Overworld();
+        currentWorld = overworld;
+
+        player = new PlayerEntity("Player", new Vec2d(17, 1), currentWorld);
+
+        hud = new Hud(player);
+        new Thread(Minecraft2D.this::startGameLoop, "Game thread").start();
     }
 
     @Override
     public void tick() {
-
-    }
-
-    @Override
-    public void renderFrame(Graphics g) {
+        player.tick();
+        currentWorld = player.getWorld();
+        Renderer.CAMERA.centerOn(player);
+        currentWorld.tick();
+        if(!player.isAlive()) {
+            state = GameState.DEATH_SCREEN;
+        }
     }
 
     @Override

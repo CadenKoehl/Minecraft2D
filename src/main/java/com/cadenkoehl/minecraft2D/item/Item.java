@@ -1,8 +1,12 @@
 package com.cadenkoehl.minecraft2D.item;
 
+import com.cadenkoehl.minecraft2D.entities.player.PlayerEntity;
+import com.cadenkoehl.minecraft2D.physics.Vec2d;
 import com.cadenkoehl.minecraft2D.render.Texture;
 
 public class Item {
+
+    public static final int ITEM_SIZE = 32;
 
     private final int maxStackSize;
     private final String displayName;
@@ -28,8 +32,18 @@ public class Item {
         return name;
     }
 
+    public ClickResult onClick(PlayerEntity player, Vec2d clickPos) {
+        return ClickResult.FAILED;
+    }
+
     public Texture getTexture() {
         return texture;
+    }
+
+    public enum ClickResult {
+        SUCCESS,
+        SHOULD_DECREMENT,
+        FAILED,
     }
 
     public static class Settings {

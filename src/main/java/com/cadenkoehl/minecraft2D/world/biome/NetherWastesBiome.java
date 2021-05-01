@@ -2,26 +2,25 @@ package com.cadenkoehl.minecraft2D.world.biome;
 
 import com.cadenkoehl.minecraft2D.block.Block;
 import com.cadenkoehl.minecraft2D.block.Blocks;
-import com.cadenkoehl.minecraft2D.world.gen.feature.CactusFeature;
 import com.cadenkoehl.minecraft2D.world.gen.feature.ConfiguredFeature;
 
 import java.util.List;
 
-public class DesertBiome implements Biome {
+public class NetherWastesBiome implements Biome {
 
     @Override
     public Block getSurfaceBlock() {
-        return Blocks.SAND;
+        return Blocks.NETHERRACK;
     }
 
     @Override
     public Block getSecondarySurfaceBlock() {
-        return Blocks.SANDSTONE;
+        return Blocks.SOUL_SAND;
     }
 
     @Override
     public List<ConfiguredFeature> getFeatures() {
-        return List.of(new CactusFeature());
+        return null;
     }
 
     @Override

@@ -1,5 +1,7 @@
 package com.cadenkoehl.minecraft2D.entities;
 
+import com.cadenkoehl.minecraft2D.block.Block;
+import com.cadenkoehl.minecraft2D.block.FluidBlock;
 import com.cadenkoehl.minecraft2D.display.GameFrame;
 import com.cadenkoehl.minecraft2D.physics.Vec2d;
 import com.cadenkoehl.minecraft2D.render.Renderer;
@@ -36,8 +38,8 @@ public abstract class Tile {
         this.displayName = displayName;
         this.name = displayName.replace(" ", "_").toLowerCase();
         this.texture = new Texture("textures/" + textureCategory + "/" + name + ".png");
-        this.height = texture.getIcon().getIconHeight();
-        this.width = texture.getIcon().getIconWidth();
+        this.height = texture.getHeight();
+        this.width = texture.getWidth();
         this.blockHeight = height / BLOCK_SIZE;
         this.blockWidth = width / BLOCK_SIZE;
     }

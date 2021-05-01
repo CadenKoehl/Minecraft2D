@@ -1,5 +1,7 @@
 package com.cadenkoehl.minecraft2D.display;
 
+import com.cadenkoehl.minecraft2D.Game;
+import com.cadenkoehl.minecraft2D.GameState;
 import com.cadenkoehl.minecraft2D.physics.Vec2d;
 
 import java.awt.*;
@@ -23,17 +25,21 @@ public class MenuButton {
             @Override
             public void mouseClicked(MouseEvent e) {
                 if(onClick != null) {
-                    if(e.getX() >= x && e.getX() <= x + width && e.getY() >= y && e.getY() <= y + height) onClick.run();
+                    if(e.getX() >= x && e.getX() <= x + width && e.getY() >= y && e.getY() <= y + height && Game.getState() == GameState.TITLE_SCREEN) onClick.run();
                 }
             }
         });
     }
 
     public void render() {
+        GameWindow.GRAPHICS.setColor(Color.DARK_GRAY);
+        GameWindow.GRAPHICS.fillRect(pos.x, pos.y, width, height);
+        GameWindow.GRAPHICS.setFont(new Font("Minecrafter", Font.BOLD, width / 10));
+        GameWindow.GRAPHICS.setColor(Color.BLACK);
+        GameWindow.GRAPHICS.drawString(text, (pos.x + width / 8) - 2, (pos.y + height / 2 + height / 10) - 2);
         GameWindow.GRAPHICS.setColor(Color.WHITE);
-        GameWindow.GRAPHICS.setFont(new Font("Courior", Font.BOLD, width / 10));
         GameWindow.GRAPHICS.drawRect(pos.x, pos.y, width, height);
-        GameWindow.GRAPHICS.drawString(text, pos.x + width / 5, pos.y + height / 2 + height / 10);
+        GameWindow.GRAPHICS.drawString(text, pos.x + width / 8, pos.y + height / 2 + height / 10);
     }
 
     public void onClick(Runnable onClick) {

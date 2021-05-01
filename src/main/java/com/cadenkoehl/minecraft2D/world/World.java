@@ -1,14 +1,17 @@
 package com.cadenkoehl.minecraft2D.world;
 
+import com.cadenkoehl.minecraft2D.Game;
 import com.cadenkoehl.minecraft2D.block.Block;
-import com.cadenkoehl.minecraft2D.block.LogBlock;
+import com.cadenkoehl.minecraft2D.block.Blocks;
+import com.cadenkoehl.minecraft2D.block.FluidBlock;
 import com.cadenkoehl.minecraft2D.display.GameFrame;
 import com.cadenkoehl.minecraft2D.entities.Tile;
 import com.cadenkoehl.minecraft2D.entities.mob.LivingEntity;
 import com.cadenkoehl.minecraft2D.physics.Vec2d;
 import com.cadenkoehl.minecraft2D.render.Renderer;
-import com.cadenkoehl.minecraft2D.util.TimeUtil;
+import com.cadenkoehl.minecraft2D.util.Util;
 import com.cadenkoehl.minecraft2D.world.gen.TerrainGenerator;
+import com.cadenkoehl.minecraft2D.world.gen.feature.ConfiguredFeature;
 
 import java.awt.*;
 import java.util.*;
@@ -25,7 +28,6 @@ public abstract class World {
     public int days;
     private static final int sunTravelLength = GameFrame.WIDTH * 2;
     private static final int dayLength = 200;
-    private int skyColorAlpha;
     public Color skyColor;
 
     public World() {
@@ -37,29 +39,32 @@ public abstract class World {
         days = 1;
         this.genSpawnTerrain();
         if(this.hasDaylightCycle()) {
-            TimeUtil.scheduleTask(this::updateDaylightCycle, dayLength);
+            Util.scheduleTask(this::updateDaylightCycle, dayLength);
         }
-        skyColorAlpha = 255;
+        skyColor = this.getSkyColor();
         updateSkyColor();
     }
 
     private void updateSkyColor() {
 
-        if(time > (sunTravelLength / 2) - (sunTravelLength / 6) && skyColorAlpha > 10) {
-            skyColorAlpha--;
+        if(time > (sunTravelLength / 2) - (sunTravelLength / 6) && skyColor.getRed() > 0 && skyColor.getGreen() > 0 && skyColor.getBlue() > 0) {
+            skyColor = new Color(skyColor.getRed() - 1, skyColor.getGreen() - 1, skyColor.getBlue() - 1);
         }
-        if(time < sunTravelLength / 4 && skyColorAlpha < 255) {
-            skyColorAlpha++;
+        if(time < sunTravelLength / 4 && skyColor.getRed() < 255 && skyColor.getGreen() < 255 && skyColor.getBlue() < 255) {
+            skyColor = new Color(skyColor.getRed() + 1, skyColor.getGreen() + 1, skyColor.getBlue() + 1);
         }
-
-        skyColor = new Color(150, 212, 246, skyColorAlpha);
     }
 
     public abstract String getDisplayName();
+    public abstract Color getSkyColor();
     public abstract TerrainGenerator getGenerator();
+    public abstract List<ConfiguredFeature> getFeatures();
     public abstract boolean hasDaylightCycle();
 
     public void tick() {
+        if(Game.getPlayer().pos.x > this.width - 12) {
+            generator.nextChunk();
+        }
         try {
             List<Block> minedBlocks = new ArrayList<>();
             for(Block block: blocks) {
@@ -96,7 +101,7 @@ public abstract class World {
             days++;
         }
         sun.pos.x = time;
-        TimeUtil.scheduleTask(this::updateDaylightCycle, dayLength);
+        Util.scheduleTask(this::updateDaylightCycle, dayLength);
     }
 
     public boolean isNight() {
@@ -157,14 +162,16 @@ public abstract class World {
         return this.getBlock(new Vec2d(x, y));
     }
 
-    public void setBlock(Block block, boolean canCollide) {
+    public boolean setBlock(Block block, boolean canCollide) {
         block = block.copy();
         block.setWorld(this);
         block.setCanCollide(canCollide);
         if(block.pos == null) throw new IllegalStateException("Block has no state yet!");
         if(this.getBlock(block.pos.x, block.pos.y) == null) {
             blocks.add(block);
+            return true;
         }
+        return false;
     }
 
     public void replaceBlock(Block block, boolean canCollide) {
@@ -176,22 +183,22 @@ public abstract class World {
         replaceBlock(block, true);
     }
 
-    public void setBlock(Block block) {
-        setBlock(block, true);
+    public boolean setBlock(Block block) {
+        return setBlock(block, true);
     }
 
-    public void setBlock(Block block, Vec2d pos) {
+    public boolean setBlock(Block block, Vec2d pos) {
         block.setPos(pos);
-        this.setBlock(block);
+        return this.setBlock(block);
     }
 
-    public void setBlock(Block block, Vec2d pos, boolean canCollide) {
+    public boolean setBlock(Block block, Vec2d pos, boolean canCollide) {
         block.setPos(pos);
-        this.setBlock(block, canCollide);
+        return this.setBlock(block, canCollide);
     }
 
 
-    public void breakBlock(Vec2d pos) {
+    public Block breakBlock(Vec2d pos) {
 
         Block brokeBlock = null;
 
@@ -200,23 +207,23 @@ public abstract class World {
                 brokeBlock = block;
             }
         }
-        if(brokeBlock == null) return;
+        if(brokeBlock == null) return null;
 
         if(brokeBlock.canBeMined()) {
             brokeBlock.mine();
+            return brokeBlock;
         }
+        return null;
     }
 
     public void render() {
         try {
-            sun.render();
+            if(this.hasDaylightCycle()) sun.render();
             renderBlocks();
             renderEntities();
         }
         catch (ConcurrentModificationException ex) {
-            sun.render();
-            renderBlocks();
-            renderEntities();
+            render();
         }
     }
     private void renderBlocks() {

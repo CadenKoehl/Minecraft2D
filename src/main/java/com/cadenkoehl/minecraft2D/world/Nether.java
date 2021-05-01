@@ -1,7 +1,7 @@
 package com.cadenkoehl.minecraft2D.world;
 
 import com.cadenkoehl.minecraft2D.block.Blocks;
-import com.cadenkoehl.minecraft2D.world.biome.Biomes;
+import com.cadenkoehl.minecraft2D.world.biome.NetherWastesBiome;
 import com.cadenkoehl.minecraft2D.world.gen.TerrainGenerator;
 import com.cadenkoehl.minecraft2D.world.gen.feature.ConfiguredFeature;
 
@@ -9,25 +9,23 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Overworld extends World {
+public class Nether extends World {
 
     @Override
     public String getDisplayName() {
-        return "The Overworld";
+        return "The Nether";
     }
 
     @Override
     public Color getSkyColor() {
-        return new Color(150, 212, 246);
+        return new Color(0x551212);
     }
 
     @Override
     public TerrainGenerator getGenerator() {
         return new TerrainGenerator.Builder(this)
-                .defaultBlock(Blocks.STONE)
-                .addCarvers()
-                .addBiome(Biomes.PLAINS)
-                .addBiome(Biomes.DESERT)
+                .addBiome(new NetherWastesBiome())
+                .defaultBlock(Blocks.NETHERRACK)
                 .depth(14)
                 .build();
     }
@@ -39,6 +37,6 @@ public class Overworld extends World {
 
     @Override
     public boolean hasDaylightCycle() {
-        return true;
+        return false;
     }
 }

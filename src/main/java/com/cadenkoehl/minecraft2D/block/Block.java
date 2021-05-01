@@ -7,7 +7,7 @@ import com.cadenkoehl.minecraft2D.physics.Vec2d;
 import com.cadenkoehl.minecraft2D.render.Texture;
 import com.cadenkoehl.minecraft2D.world.World;
 
-public abstract class Block extends Tile {
+public class Block extends Tile {
 
     private boolean canCollide;
     private boolean mined;
@@ -23,6 +23,10 @@ public abstract class Block extends Tile {
         super(pos, world, "block", displayName);
         this.canCollide = canCollide;
         this.blockItem = new BlockItem(new Item.Settings(displayName), this);
+    }
+
+    public BlockItem getItem() {
+        return blockItem;
     }
 
     public void setCanCollide(boolean canCollide) {
@@ -68,6 +72,11 @@ public abstract class Block extends Tile {
             }
 
             @Override
+            public Texture getTexture() {
+                return Block.this.getTexture();
+            }
+
+            @Override
             public boolean canBeMined() {
                 return Block.this.canBeMined();
             }
@@ -76,6 +85,7 @@ public abstract class Block extends Tile {
             public Block getBlockBehind() {
                 return Block.this.getBlockBehind();
             }
+
         };
     }
 }

@@ -8,10 +8,9 @@ public class TreeFeature implements ConfiguredFeature {
 
     @Override
     public void generate(int startX, int startY, World world) {
-        world.setBlock(Blocks.LOG, new Vec2d(startX, startY), false);
-        world.setBlock(Blocks.LOG, new Vec2d(startX, startY - 1), false);
-        world.setBlock(Blocks.LOG, new Vec2d(startX, startY - 2), false);
-        world.setBlock(Blocks.LOG, new Vec2d(startX, startY - 3), false);
+        world.setBlock(Blocks.OAK_LOG, new Vec2d(startX, startY - 1), false);
+        world.setBlock(Blocks.OAK_LOG, new Vec2d(startX, startY - 2), false);
+        world.setBlock(Blocks.OAK_LOG, new Vec2d(startX, startY - 3), false);
         world.setBlock(Blocks.LEAF_BLOCK, new Vec2d(startX, startY - 4), false);
         world.setBlock(Blocks.LEAF_BLOCK, new Vec2d(startX + 1, startY - 4), false);
         world.setBlock(Blocks.LEAF_BLOCK, new Vec2d(startX + 1, startY - 5));

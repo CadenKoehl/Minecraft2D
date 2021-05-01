@@ -14,12 +14,15 @@ import com.cadenkoehl.minecraft2D.world.gen.feature.ConfiguredFeature;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.cadenkoehl.minecraft2D.util.Util.random;
+
 public abstract class TerrainGenerator {
 
-    abstract World getWorld();
-    abstract Block getDefaultBlock();
-    abstract List<Biome> getBiomes();
-    abstract boolean shouldGenerateCaves();
+    public abstract World getWorld();
+    public abstract Block getDefaultBlock();
+    public abstract List<Biome> getBiomes();
+    public abstract boolean shouldGenerateCaves();
+    public abstract int getDepth();
 
     public final int surfaceHeight = GameFrame.HEIGHT / Tile.BLOCK_SIZE - 2;
     private final World world = this.getWorld();
@@ -29,7 +32,7 @@ public abstract class TerrainGenerator {
 
     public void genSpawn() {
         currentBiome = getBiomes().get(0);
-        Logger.log(LogLevel.INFO, "Generating level...");
+        Logger.log(LogLevel.INFO, "Generating " + world.getDisplayName() + "...");
         genChunk(0);
         Logger.log(LogLevel.INFO, "Done!");
     }
@@ -44,15 +47,20 @@ public abstract class TerrainGenerator {
         chunkX = chunkX * 16;
 
         for(int x = chunkX; x < chunkX + 16; x++) {
-            //surface
-            gen(currentBiome.getSurfaceBlock(), x, surfaceHeight);
-            gen(currentBiome.getSecondarySurfaceBlock(), x, surfaceHeight + 1);
-            genDefaultBlocks(x);
 
+            genBedrock(x);
+
+            //features/structures
             if(x % 16 == 0) {
                 genFeatures(x);
             }
+
+            //general terrain
+            gen(currentBiome.getSurfaceBlock(), x, surfaceHeight);
+            gen(currentBiome.getSecondarySurfaceBlock(), x, surfaceHeight + 1);
+            genDefaultBlocks(x);
         }
+        gen(currentBiome.getSecondarySurfaceBlock(), chunkX + 16, surfaceHeight + 1);
         chunks++;
         world.width = world.width + 16;
     }
@@ -60,9 +68,12 @@ public abstract class TerrainGenerator {
     public void genFeatures(int x) {
         if(currentBiome.getFeatures() == null) return;
 
+        int xOffset = 2;
         for(ConfiguredFeature feature : currentBiome.getFeatures()) {
             if(random(feature.rarity() + 1)) {
-                feature.generate(x, surfaceHeight, world);
+                xOffset = xOffset + 5;
+                if(xOffset > 16) return;
+                feature.generate(x + xOffset, surfaceHeight, world);
             }
         }
     }
@@ -85,9 +96,16 @@ public abstract class TerrainGenerator {
     }
 
     private void genDefaultBlocks(int x) {
-        for(int y = 2; y < 10; y++) {
-            gen(this.getDefaultBlock(), x, surfaceHeight + y);
+        for(int y = 2; y < this.getDepth(); y++) {
+            if(random(2) && y < this.getDepth() / 2) gen(currentBiome.getSecondarySurfaceBlock(), x, surfaceHeight + y);
+            else gen(this.getDefaultBlock(), x, surfaceHeight + y);
         }
+    }
+
+    private void genBedrock(int x) {
+        gen(Blocks.BEDROCK, x, surfaceHeight + getDepth());
+        if(random(2)) gen(Blocks.BEDROCK, x, surfaceHeight + getDepth() - 1);
+        if(random(3)) gen(Blocks.BEDROCK, x, surfaceHeight + getDepth() - 2);
     }
 
     private void gen(Block block, int x, int y, boolean canCollide) {
@@ -101,26 +119,11 @@ public abstract class TerrainGenerator {
         gen(block, x, y, true);
     }
 
-    private void cave(int x) {
-        replace(Blocks.BACKGROUND_STONE, x, surfaceHeight + 4, false);
-        replace(Blocks.BACKGROUND_STONE, x, surfaceHeight + 5, false);
-        replace(Blocks.BACKGROUND_STONE, x, surfaceHeight + 6, false);
-    }
-
     private void replace(Block block, int x, int y, boolean canCollide) {
         Block blockCopy = block.copy();
         blockCopy.setCanCollide(canCollide);
         blockCopy.setPos(new Vec2d(x, y));
         world.replaceBlock(blockCopy);
-    }
-
-    /**
-     * @param chance The probability that this method will return true
-     * @return true or false
-     */
-    private boolean random(int chance) {
-        int random = (int) Math.round(Math.random() * Math.abs(chance));
-        return random == 1;
     }
 
     public int getChunks() {
@@ -133,6 +136,7 @@ public abstract class TerrainGenerator {
         private Block defaultBlock;
         private final List<Biome> biomes;
         private boolean caves;
+        private int depth;
 
         public Builder(World world) {
             this.world = world;
@@ -154,6 +158,11 @@ public abstract class TerrainGenerator {
             return this;
         }
 
+        public Builder depth(int depth) {
+            this.depth = depth;
+            return this;
+        }
+
         public TerrainGenerator build() {
             return new TerrainGenerator() {
                 @Override
@@ -167,13 +176,18 @@ public abstract class TerrainGenerator {
                 }
 
                 @Override
-                List<Biome> getBiomes() {
+                public List<Biome> getBiomes() {
                     return biomes;
                 }
                 
                 @Override
-                boolean shouldGenerateCaves() {
+                public boolean shouldGenerateCaves() {
                     return caves;
+                }
+
+                @Override
+                public int getDepth() {
+                    return depth;
                 }
             };
         }

@@ -21,7 +21,7 @@ public class PlainsBiome implements Biome {
 
     @Override
     public List<ConfiguredFeature> getFeatures() {
-        return List.of(new TreeFeature());
+        return List.of(new TreeFeature(), new LakeFeature(Blocks.WATER));
     }
 
     @Override

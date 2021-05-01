@@ -4,6 +4,9 @@ import com.cadenkoehl.minecraft2D.block.Block;
 import com.cadenkoehl.minecraft2D.block.Blocks;
 import com.cadenkoehl.minecraft2D.display.Hud;
 import com.cadenkoehl.minecraft2D.entities.mob.LivingEntity;
+import com.cadenkoehl.minecraft2D.item.Inventory;
+import com.cadenkoehl.minecraft2D.item.Item;
+import com.cadenkoehl.minecraft2D.item.ItemStack;
 import com.cadenkoehl.minecraft2D.physics.Vec2d;
 import com.cadenkoehl.minecraft2D.render.Texture;
 import com.cadenkoehl.minecraft2D.world.World;
@@ -11,28 +14,45 @@ import com.cadenkoehl.minecraft2D.world.World;
 public class PlayerEntity extends LivingEntity {
 
     public final Vec2d originalPos;
-    public Block heldBlock;
+    private final Inventory inventory;
+    public boolean isInventoryOpen;
 
     public PlayerEntity(String username, Vec2d vec2d, World world) {
         super(vec2d, world, username);
         this.originalPos = vec2d;
-        this.heldBlock = Blocks.DIRT;
+        this.inventory = new Inventory(this);
     }
 
-    public void placeBlock(Vec2d pos) {
-        placeBlock(pos, heldBlock);
+    public void changeDimension(World newDimension) {
+
     }
 
-    public void placeBlock(Vec2d pos, Block block) {
+    public void clickItem(Vec2d clickPos) {
+
+        ItemStack item = inventory.getSelectedItem();
+        if(item == null) return;
+
+        Item.ClickResult result = item.getItem().onClick(this, clickPos);
+        if(result == Item.ClickResult.SHOULD_DECREMENT) item.decrement();
+    }
+
+    public Inventory getInventory() {
+        return inventory;
+    }
+
+    public boolean placeBlock(Vec2d pos, Block block) {
         if(distanceFrom(pos) <= getReach()) {
-            this.getWorld().setBlock(block, pos);
-            block.updateGraphics();
+            return this.getWorld().setBlock(block, pos, block.canCollide());
         }
+        return false;
     }
 
     public void breakBlock(Vec2d pos) {
         if(distanceFrom(pos) <= getReach()) {
-            this.getWorld().breakBlock(pos);
+            Block block = this.getWorld().breakBlock(pos);
+            if(block == null) return;
+
+            inventory.addItem(new ItemStack(block.getItem()));
         }
     }
 
