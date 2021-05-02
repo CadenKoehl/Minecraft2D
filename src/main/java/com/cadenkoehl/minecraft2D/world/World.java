@@ -10,9 +10,12 @@ import com.cadenkoehl.minecraft2D.entities.Tile;
 import com.cadenkoehl.minecraft2D.entities.mob.LivingEntity;
 import com.cadenkoehl.minecraft2D.physics.Vec2d;
 import com.cadenkoehl.minecraft2D.render.Renderer;
+import com.cadenkoehl.minecraft2D.util.LogLevel;
+import com.cadenkoehl.minecraft2D.util.Logger;
 import com.cadenkoehl.minecraft2D.util.Util;
 import com.cadenkoehl.minecraft2D.world.gen.TerrainGenerator;
 import com.cadenkoehl.minecraft2D.world.gen.feature.ConfiguredFeature;
+import com.cadenkoehl.minecraft2D.world.gen.feature.NetherPortalFeature;
 
 import java.awt.*;
 import java.util.*;
@@ -32,8 +35,10 @@ public abstract class World {
     private final Random random;
     public Color skyColor;
     private final long seed;
+    public final List<List<Vec2d>> netherPortals;
 
     public World(long seed) {
+        this.netherPortals = new ArrayList<>();
         this.seed = seed;
         this.random = new Random(seed);
         this.blocks = new ArrayList<>();
@@ -156,6 +161,27 @@ public abstract class World {
             if(block.pos.x == vec2d.x && block.pos.y == vec2d.y) return block;
         }
         return null;
+    }
+
+    public void spawnPortal(int x, int y) {
+        new NetherPortalFeature().generate(x, y, this);
+        for(List<Vec2d> portal : netherPortals) {
+            for(Vec2d pos : portal) {
+                if(pos.x == x && pos.y == y) {
+                    lightPortal(portal);
+                    return;
+                }
+            }
+        }
+        Logger.log(LogLevel.WARN, "Failed to light portal at " + x + " " + y);
+    }
+
+    public void lightPortal(List<Vec2d> portal) {
+        for(Vec2d pos : portal) {
+            Block copy = Blocks.NETHER_PORTAL.copy();
+            copy.setPos(pos);
+            replaceBlock(copy, false);
+        }
     }
 
     public List<Block> getBlocks() {

@@ -10,7 +10,7 @@ public class ObsidianBlock extends Block {
     }
 
     @Override
-    public boolean canCollide() {
+    public boolean canBeMined() {
         return false;
     }
 }

@@ -18,4 +18,14 @@ public abstract class FluidBlock extends Block {
     }
 
     public abstract Color getColor();
+
+    @Override
+    public boolean canCollide() {
+        return false;
+    }
+
+    @Override
+    public boolean canBeMined() {
+        return false;
+    }
 }

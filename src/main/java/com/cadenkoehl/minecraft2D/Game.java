@@ -96,6 +96,13 @@ public abstract class Game {
             currentWorld.render();
             player.render();
             hud.update();
+
+            if(player.portalTicks > 0) {
+                Color oldColor = g.getColor();
+                g.setColor(new Color(136, 0, 255, 100));
+                g.fillRect(0, 0, GameFrame.WIDTH, GameFrame.HEIGHT);
+                g.setColor(oldColor);
+            }
         }
 
         if(state == GameState.DEATH_SCREEN) {

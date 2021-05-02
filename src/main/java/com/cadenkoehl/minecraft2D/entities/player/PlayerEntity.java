@@ -3,6 +3,7 @@ package com.cadenkoehl.minecraft2D.entities.player;
 import com.cadenkoehl.minecraft2D.block.Block;
 import com.cadenkoehl.minecraft2D.block.Blocks;
 import com.cadenkoehl.minecraft2D.display.Hud;
+import com.cadenkoehl.minecraft2D.entities.Tile;
 import com.cadenkoehl.minecraft2D.entities.mob.LivingEntity;
 import com.cadenkoehl.minecraft2D.item.Inventory;
 import com.cadenkoehl.minecraft2D.item.Item;
@@ -10,6 +11,8 @@ import com.cadenkoehl.minecraft2D.item.ItemStack;
 import com.cadenkoehl.minecraft2D.physics.Vec2d;
 import com.cadenkoehl.minecraft2D.render.Texture;
 import com.cadenkoehl.minecraft2D.world.World;
+
+import java.util.List;
 
 public class PlayerEntity extends LivingEntity {
 
@@ -21,10 +24,6 @@ public class PlayerEntity extends LivingEntity {
         super(vec2d, world, username);
         this.originalPos = vec2d;
         this.inventory = new Inventory(this);
-    }
-
-    public void changeDimension(World newDimension) {
-
     }
 
     public void clickItem(Vec2d clickPos) {
@@ -59,11 +58,6 @@ public class PlayerEntity extends LivingEntity {
     @Override
     public int getMaxDamageCooldown() {
         return 400;
-    }
-
-    @Override
-    public void render() {
-        super.render();
     }
 
     @Override

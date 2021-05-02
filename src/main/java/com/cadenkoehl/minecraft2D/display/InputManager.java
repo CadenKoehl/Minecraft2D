@@ -64,8 +64,6 @@ public class InputManager {
             case KeyEvent.VK_E -> game.player.isInventoryOpen = !game.player.isInventoryOpen;
 
             //Debug Controls
-            case KeyEvent.VK_N -> game.player.setWorld(Game.getNether());
-            case KeyEvent.VK_O -> game.player.setWorld(Game.getOverworld());
             case KeyEvent.VK_F3 -> Hud.f3 = !Hud.f3;
             case KeyEvent.VK_F2 -> game.getWindow().takeScreenshot();
         }

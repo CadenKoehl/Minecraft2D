@@ -1,11 +1,16 @@
 package com.cadenkoehl.minecraft2D.entities.mob;
 
+import com.cadenkoehl.minecraft2D.Game;
 import com.cadenkoehl.minecraft2D.block.Block;
+import com.cadenkoehl.minecraft2D.block.NetherPortalBlock;
 import com.cadenkoehl.minecraft2D.entities.Tile;
 import com.cadenkoehl.minecraft2D.physics.Vec2d;
 import com.cadenkoehl.minecraft2D.util.Util;
+import com.cadenkoehl.minecraft2D.world.Nether;
+import com.cadenkoehl.minecraft2D.world.Overworld;
 import com.cadenkoehl.minecraft2D.world.World;
 
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -17,6 +22,9 @@ public abstract class LivingEntity extends Tile {
     private boolean alive;
     private int damageCooldown;
     private int healCooldown;
+    public int portalTicks;
+    public Block blockOnHead;
+    public Block blockOnFeet;
 
     public LivingEntity(Vec2d pos, World world, String displayName) {
         super(pos, world, "entities", displayName);
@@ -33,10 +41,19 @@ public abstract class LivingEntity extends Tile {
             return;
         }
 
+        blockOnHead = this.getWorld().getBlock(pos.x, pos.y);
+        blockOnFeet = this.getWorld().getBlock(pos.x, pos.y + 1);
+
         super.tick();
 
         damageCooldown--;
         healCooldown--;
+
+        if(portalTicks > 500) {
+            portalTicks = 0;
+            if(this.getWorld() instanceof Overworld) setWorld(Game.getNether());
+            else setWorld(Game.getOverworld());
+        }
 
         if(this.affectedByGravity) {
             setVelocityY(1);
@@ -45,6 +62,15 @@ public abstract class LivingEntity extends Tile {
             healCooldown = 10000;
             heal();
         }
+
+        if(blockOnHead != null && blockOnHead.getName().equals("nether_portal")) {
+            portalTicks++;
+        }
+        else if(blockOnFeet != null && blockOnFeet.getName().equals("nether_portal")) {
+            portalTicks++;
+        }
+        else portalTicks = 0;
+        portalTicks = 0;
     }
 
     public void heal() {
@@ -53,7 +79,7 @@ public abstract class LivingEntity extends Tile {
         }
     }
 
-    protected void updatePosX(){
+    protected void updatePosX() {
 
         //Moving right
         if(velocity.x > 0) {
@@ -99,17 +125,24 @@ public abstract class LivingEntity extends Tile {
     }
 
     public boolean collisionWithBlock(int x, int y) {
-        Block block = this.getWorld().getBlock(new Vec2d(x, y));
+
+        Block block;
+
+        if(pos.x == x && pos.y == y) {
+            block = blockOnHead;
+        }
+        else if(pos.x == x && pos.y == y + 1) {
+            block = blockOnFeet;
+        }
+        else {
+            block = this.getWorld().getBlock(new Vec2d(x, y));
+        }
 
         if (block == null) {
             return false;
         }
 
         return block.canCollide();
-    }
-
-    public boolean inWater() {
-        return getWorld().getBlock(this.pos) != null || getWorld().getBlock(new Vec2d(pos.x, pos.y + 1)) != null;
     }
 
     public boolean hasCollidedWith(Tile entity) {
@@ -136,7 +169,7 @@ public abstract class LivingEntity extends Tile {
     }
 
     public void jump(long force) {
-        if(this.isOnGround() || this.inWater()) {
+        if(this.isOnGround()) {
             affectedByGravity = false;
             setVelocityY(-1);
 

@@ -9,7 +9,6 @@ import com.cadenkoehl.minecraft2D.render.Texture;
 import com.cadenkoehl.minecraft2D.util.LogLevel;
 import com.cadenkoehl.minecraft2D.util.Logger;
 import com.cadenkoehl.minecraft2D.world.Overworld;
-import jdk.swing.interop.SwingInterOpUtils;
 
 public class Minecraft2D extends Game {
 
@@ -27,7 +26,7 @@ public class Minecraft2D extends Game {
         overworld = new Overworld(System.nanoTime());
         currentWorld = overworld;
 
-        player = new PlayerEntity("Player", new Vec2d(17, 1), currentWorld);
+        player = new PlayerEntity("Player", new Vec2d(17, 4), currentWorld);
 
         hud = new Hud(player);
         new Thread(Minecraft2D.this::startGameLoop, "Game thread").start();
