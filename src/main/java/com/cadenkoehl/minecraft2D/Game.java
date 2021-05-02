@@ -32,6 +32,9 @@ public abstract class Game {
     public GameState state = GameState.TITLE_SCREEN;
 
     public Game() {
+
+        Runtime.getRuntime().addShutdownHook(new Thread(this::stop, "Shutdown thread"));
+
         this.frame = new GameFrame();
         this.window = new GameWindow(this, frame);
         frame.add(window);
@@ -63,7 +66,7 @@ public abstract class Game {
 
     public static Nether getNether() {
         if(INSTANCE.nether == null) {
-            INSTANCE.nether = new Nether();
+            INSTANCE.nether = new Nether(System.nanoTime());
         }
         return INSTANCE.nether;
     }

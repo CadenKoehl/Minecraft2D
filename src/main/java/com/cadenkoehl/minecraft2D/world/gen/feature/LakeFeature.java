@@ -1,4 +1,4 @@
-package com.cadenkoehl.minecraft2D.world.biome;
+package com.cadenkoehl.minecraft2D.world.gen.feature;
 
 import com.cadenkoehl.minecraft2D.block.FluidBlock;
 import com.cadenkoehl.minecraft2D.physics.Vec2d;
@@ -32,6 +32,6 @@ public class LakeFeature implements ConfiguredFeature {
 
     @Override
     public int rarity() {
-        return 3;
+        return 4;
     }
 }

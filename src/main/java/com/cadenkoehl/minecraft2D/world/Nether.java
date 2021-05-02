@@ -11,6 +11,10 @@ import java.util.List;
 
 public class Nether extends World {
 
+    public Nether(long seed) {
+        super(seed);
+    }
+
     @Override
     public String getDisplayName() {
         return "The Nether";

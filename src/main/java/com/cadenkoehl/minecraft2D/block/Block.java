@@ -12,20 +12,23 @@ public class Block extends Tile {
     private boolean canCollide;
     private boolean mined;
     private final BlockItem blockItem;
+    private final Texture texture;
 
     public Block(String displayName, Vec2d pos, World world) {
         super(pos, world, "block", displayName);
         canCollide = true;
         this.blockItem = new BlockItem(new Item.Settings(displayName), this);
+        this.texture = new Texture("textures/blocks/" + getName() + ".png");
     }
 
     public Block(String displayName, Vec2d pos, World world, boolean canCollide) {
         super(pos, world, "block", displayName);
         this.canCollide = canCollide;
         this.blockItem = new BlockItem(new Item.Settings(displayName), this);
+        this.texture = new Texture("textures/blocks/" + getName() + ".png");
     }
 
-    public BlockItem getItem() {
+    public Item getItem() {
         return blockItem;
     }
 
@@ -53,14 +56,11 @@ public class Block extends Tile {
         if(canBeMined()) {
             mined = true;
         }
-
-        //if(blockItem == null) return;
-        //this.getWorld().spawnEntity(new ItemEntity(new ItemStack(blockItem), new Vec2d(pos.x, pos.y), this.getWorld()));
     }
 
     @Override
     public Texture getTexture() {
-        return new Texture("textures/blocks/" + getName() + ".png");
+        return texture;
     }
 
     public Block copy() {
@@ -79,6 +79,11 @@ public class Block extends Tile {
             @Override
             public boolean canBeMined() {
                 return Block.this.canBeMined();
+            }
+
+            @Override
+            public Item getItem() {
+                return Block.this.getItem();
             }
 
             @Override

@@ -11,13 +11,13 @@ public class CactusFeature implements ConfiguredFeature {
     public void generate(int startX, int startY, World world) {
         world.setBlock(Blocks.CACTUS, new Vec2d(startX, startY - 1), false);
         world.setBlock(Blocks.CACTUS, new Vec2d(startX, startY - 2), false);
-        if(Util.random(2)) {
+        if(world.random(2)) {
             world.setBlock(Blocks.CACTUS, new Vec2d(startX, startY - 3), false);
         }
     }
 
     @Override
     public int rarity() {
-        return 0;
+        return 1;
     }
 }

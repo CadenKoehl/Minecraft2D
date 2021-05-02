@@ -14,8 +14,6 @@ import com.cadenkoehl.minecraft2D.world.gen.feature.ConfiguredFeature;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.cadenkoehl.minecraft2D.util.Util.random;
-
 public abstract class TerrainGenerator {
 
     public abstract World getWorld();
@@ -32,7 +30,7 @@ public abstract class TerrainGenerator {
 
     public void genSpawn() {
         currentBiome = getBiomes().get(0);
-        Logger.log(LogLevel.INFO, "Generating " + world.getDisplayName() + "...");
+        Logger.log(LogLevel.INFO, "Generating " + world.getDisplayName() + " with seed " + world.getSeed() + "...");
         genChunk(0);
         Logger.log(LogLevel.INFO, "Done!");
     }
@@ -70,7 +68,7 @@ public abstract class TerrainGenerator {
 
         int xOffset = 2;
         for(ConfiguredFeature feature : currentBiome.getFeatures()) {
-            if(random(feature.rarity() + 1)) {
+            if(world.random(feature.rarity() + 1)) {
                 xOffset = xOffset + 5;
                 if(xOffset > 16) return;
                 feature.generate(x + xOffset, surfaceHeight, world);
@@ -81,11 +79,11 @@ public abstract class TerrainGenerator {
     private void nextBiome() {
 
         if(chunksInCurrentBiome < 4) return;
-        if(!random(2)) return;
+        if(!world.random(2)) return;
 
         for(Biome biome : this.getBiomes()) {
             if(biome == currentBiome) continue;
-            if(random(biome.rarity() + 1)) {
+            if(world.random(biome.rarity() + 1)) {
                 currentBiome = biome;
                 chunksInCurrentBiome = 0;
                 return;
@@ -97,15 +95,15 @@ public abstract class TerrainGenerator {
 
     private void genDefaultBlocks(int x) {
         for(int y = 2; y < this.getDepth(); y++) {
-            if(random(2) && y < this.getDepth() / 2) gen(currentBiome.getSecondarySurfaceBlock(), x, surfaceHeight + y);
+            if(world.random(2) && y < this.getDepth() / 2) gen(currentBiome.getSecondarySurfaceBlock(), x, surfaceHeight + y);
             else gen(this.getDefaultBlock(), x, surfaceHeight + y);
         }
     }
 
     private void genBedrock(int x) {
         gen(Blocks.BEDROCK, x, surfaceHeight + getDepth());
-        if(random(2)) gen(Blocks.BEDROCK, x, surfaceHeight + getDepth() - 1);
-        if(random(3)) gen(Blocks.BEDROCK, x, surfaceHeight + getDepth() - 2);
+        if(world.random(2)) gen(Blocks.BEDROCK, x, surfaceHeight + getDepth() - 1);
+        if(world.random(3)) gen(Blocks.BEDROCK, x, surfaceHeight + getDepth() - 2);
     }
 
     private void gen(Block block, int x, int y, boolean canCollide) {

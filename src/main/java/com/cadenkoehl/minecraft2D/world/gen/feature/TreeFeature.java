@@ -24,6 +24,6 @@ public class TreeFeature implements ConfiguredFeature {
 
     @Override
     public int rarity() {
-        return 0;
+        return 1;
     }
 }

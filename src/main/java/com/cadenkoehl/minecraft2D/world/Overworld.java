@@ -11,6 +11,10 @@ import java.util.List;
 
 public class Overworld extends World {
 
+    public Overworld(long seed) {
+        super(seed);
+    }
+
     @Override
     public String getDisplayName() {
         return "The Overworld";

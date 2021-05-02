@@ -1,6 +1,7 @@
 package com.cadenkoehl.minecraft2D.world;
 
 import com.cadenkoehl.minecraft2D.Game;
+import com.cadenkoehl.minecraft2D.GameState;
 import com.cadenkoehl.minecraft2D.block.Block;
 import com.cadenkoehl.minecraft2D.block.Blocks;
 import com.cadenkoehl.minecraft2D.block.FluidBlock;
@@ -28,9 +29,13 @@ public abstract class World {
     public int days;
     private static final int sunTravelLength = GameFrame.WIDTH * 2;
     private static final int dayLength = 200;
+    private final Random random;
     public Color skyColor;
+    private final long seed;
 
-    public World() {
+    public World(long seed) {
+        this.seed = seed;
+        this.random = new Random(seed);
         this.blocks = new ArrayList<>();
         this.entities = new ArrayList<>();
         this.generator = this.getGenerator();
@@ -43,6 +48,18 @@ public abstract class World {
         }
         skyColor = this.getSkyColor();
         updateSkyColor();
+        new Thread(this::startChunkGen, "Chunk gen thread").start();
+    }
+
+    public void startChunkGen() {
+        while(true) {
+            new Scanner(System.in);
+            if(Game.getPlayer() != null) {
+                if(Game.getPlayer().pos.x > this.width - 12) {
+                    generator.nextChunk();
+                }
+            }
+        }
     }
 
     private void updateSkyColor() {
@@ -62,9 +79,6 @@ public abstract class World {
     public abstract boolean hasDaylightCycle();
 
     public void tick() {
-        if(Game.getPlayer().pos.x > this.width - 12) {
-            generator.nextChunk();
-        }
         try {
             List<Block> minedBlocks = new ArrayList<>();
             for(Block block: blocks) {
@@ -172,6 +186,22 @@ public abstract class World {
             return true;
         }
         return false;
+    }
+
+    /**
+     * @param chance The probability that this method will return true
+     * @return true or false
+     */
+    public boolean random(int chance) {
+        return random.nextInt(Math.abs(chance)) == 0;
+    }
+
+    public Random getRandom() {
+        return random;
+    }
+
+    public long getSeed() {
+        return seed;
     }
 
     public void replaceBlock(Block block, boolean canCollide) {

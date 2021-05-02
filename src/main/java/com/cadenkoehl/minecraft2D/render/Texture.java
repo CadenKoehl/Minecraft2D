@@ -46,12 +46,15 @@ public class Texture {
 
     public Texture rescale(int newSize) {
         if(this.icon == null) {
-            this.height = newSize;
-            this.width = newSize;
-            return this;
+            return new Texture(color, newSize, newSize);
         }
-        this.icon = new ImageIcon(icon.getImage().getScaledInstance(newSize, newSize, Image.SCALE_SMOOTH));
-        return this;
+        Texture texture = new Texture(this.path, newSize);
+        texture.setIcon(new ImageIcon(icon.getImage().getScaledInstance(newSize, newSize, Image.SCALE_SMOOTH)));
+        return texture;
+    }
+
+    public void setIcon(ImageIcon icon) {
+        this.icon = icon;
     }
 
     public Color getColor() {

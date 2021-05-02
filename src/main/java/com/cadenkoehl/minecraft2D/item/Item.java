@@ -17,7 +17,7 @@ public class Item {
         this.maxStackSize = settings.maxStackSize;
         this.displayName = settings.displayName;
         this.name = settings.name;
-        this.texture = new Texture("textures/items/" + name + ".png", 1);
+        this.texture = new Texture("textures/items/" + name + ".png", 2);
     }
 
     public int getMaxStackSize() {
@@ -63,10 +63,12 @@ public class Item {
             this.maxStackSize = maxStackSize;
             return this;
         }
+
         public Settings displayName(String displayName) {
             this.displayName = displayName;
             return this;
         }
+
         public Settings name(String name) {
             this.name = name;
             return this;

@@ -6,6 +6,8 @@ import com.cadenkoehl.minecraft2D.item.crafting.Recipes;
 import com.cadenkoehl.minecraft2D.physics.Vec2d;
 import com.cadenkoehl.minecraft2D.render.Renderer;
 import com.cadenkoehl.minecraft2D.render.Texture;
+import com.cadenkoehl.minecraft2D.util.LogLevel;
+import com.cadenkoehl.minecraft2D.util.Logger;
 import com.cadenkoehl.minecraft2D.world.Overworld;
 import jdk.swing.interop.SwingInterOpUtils;
 
@@ -22,7 +24,7 @@ public class Minecraft2D extends Game {
 
         state = GameState.GAME;
 
-        overworld = new Overworld();
+        overworld = new Overworld(System.nanoTime());
         currentWorld = overworld;
 
         player = new PlayerEntity("Player", new Vec2d(17, 1), currentWorld);
@@ -44,6 +46,6 @@ public class Minecraft2D extends Game {
 
     @Override
     public void stop() {
-
+        Logger.log(LogLevel.INFO, "Shutting down!");
     }
 }
