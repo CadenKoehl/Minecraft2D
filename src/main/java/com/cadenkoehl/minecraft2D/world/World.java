@@ -1,15 +1,13 @@
 package com.cadenkoehl.minecraft2D.world;
 
 import com.cadenkoehl.minecraft2D.Game;
-import com.cadenkoehl.minecraft2D.GameState;
 import com.cadenkoehl.minecraft2D.block.Block;
 import com.cadenkoehl.minecraft2D.block.Blocks;
-import com.cadenkoehl.minecraft2D.block.FluidBlock;
 import com.cadenkoehl.minecraft2D.display.GameFrame;
 import com.cadenkoehl.minecraft2D.entities.Tile;
 import com.cadenkoehl.minecraft2D.entities.mob.LivingEntity;
+import com.cadenkoehl.minecraft2D.entities.player.PlayerEntity;
 import com.cadenkoehl.minecraft2D.physics.Vec2d;
-import com.cadenkoehl.minecraft2D.render.Renderer;
 import com.cadenkoehl.minecraft2D.util.LogLevel;
 import com.cadenkoehl.minecraft2D.util.Logger;
 import com.cadenkoehl.minecraft2D.util.Util;
@@ -247,8 +245,7 @@ public abstract class World {
         return this.setBlock(block, canCollide);
     }
 
-
-    public Block breakBlock(Vec2d pos) {
+    public Block breakBlock(PlayerEntity player, Vec2d pos) {
 
         Block brokeBlock = null;
 
@@ -261,12 +258,13 @@ public abstract class World {
             }
         }
         if(brokeBlock == null) return null;
-
-        if(brokeBlock.canBeMined()) {
-            brokeBlock.mine();
-            return brokeBlock;
+        if(!brokeBlock.canBeMined()) return null;
+        if(brokeBlock.minedTicks < brokeBlock.getBreakSpeed() * 9) {
+            brokeBlock.miner = player;
+            return null;
         }
-        return null;
+        brokeBlock.mine();
+        return brokeBlock;
     }
 
     public void render() {

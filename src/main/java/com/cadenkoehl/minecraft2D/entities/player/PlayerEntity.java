@@ -48,7 +48,7 @@ public class PlayerEntity extends LivingEntity {
 
     public void breakBlock(Vec2d pos) {
         if(distanceFrom(pos) <= getReach()) {
-            Block block = this.getWorld().breakBlock(pos);
+            Block block = this.getWorld().breakBlock(this, pos);
             if(block == null) return;
 
             inventory.addItem(new ItemStack(block.getItem()));

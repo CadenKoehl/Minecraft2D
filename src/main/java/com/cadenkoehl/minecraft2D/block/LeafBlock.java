@@ -13,4 +13,9 @@ public class LeafBlock extends Block {
     public boolean canCollide() {
         return false;
     }
+
+    @Override
+    public int getBreakSpeed() {
+        return 1;
+    }
 }

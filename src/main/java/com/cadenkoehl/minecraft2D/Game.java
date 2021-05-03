@@ -28,7 +28,7 @@ public abstract class Game {
     public int delay = 2;
     private int fpsCounter;
     public final TitleScreen titleScreen;
-    public final InputManager inputManager;
+    public final Input inputManager;
     public GameState state = GameState.TITLE_SCREEN;
 
     public Game() {
@@ -43,7 +43,7 @@ public abstract class Game {
         singleplayer.onClick(this::init);
         titleScreen = new TitleScreen();
         titleScreen.add(singleplayer);
-        this.inputManager = new InputManager(this);
+        this.inputManager = new Input(this);
         scheduleFPSTimer();
         INSTANCE = this;
     }

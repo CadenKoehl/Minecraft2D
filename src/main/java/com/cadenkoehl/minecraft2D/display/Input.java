@@ -15,10 +15,11 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.util.Map;
 
-public class InputManager {
+public class Input {
     private final Game game;
+    private static boolean mousePressed;
 
-    public InputManager(Game game) {
+    public Input(Game game) {
         this.game = game;
     }
 
@@ -78,6 +79,7 @@ public class InputManager {
     }
 
     public void onMouseClicked(MouseEvent event) {
+        mousePressed = true;
         if(game.state != GameState.GAME) return;
 
         Vec2d pos = Vec2d.toGamePos(new Vec2d(event.getX() + Renderer.CAMERA.offset.x, event.getY() + Renderer.CAMERA.offset.y));
@@ -122,6 +124,14 @@ public class InputManager {
                 }
             }
         }
+    }
+
+    public void onMouseReleased(MouseEvent event) {
+        mousePressed = false;
+    }
+
+    public static boolean isMousePressed() {
+        return mousePressed;
     }
 
     public Vec2d getMousePosition() {

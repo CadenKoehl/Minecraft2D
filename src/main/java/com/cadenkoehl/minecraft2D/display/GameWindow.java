@@ -64,8 +64,13 @@ public class GameWindow extends JPanel {
 
         this.addMouseListener(new MouseAdapter() {
             @Override
-            public void mouseClicked(MouseEvent e) {
+            public void mousePressed(MouseEvent e) {
                 game.inputManager.onMouseClicked(e);
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                game.inputManager.onMouseReleased(e);
             }
         });
     }

@@ -1,5 +1,6 @@
 package com.cadenkoehl.minecraft2D.entities;
 
+import com.cadenkoehl.minecraft2D.Game;
 import com.cadenkoehl.minecraft2D.block.Block;
 import com.cadenkoehl.minecraft2D.block.FluidBlock;
 import com.cadenkoehl.minecraft2D.display.GameFrame;
