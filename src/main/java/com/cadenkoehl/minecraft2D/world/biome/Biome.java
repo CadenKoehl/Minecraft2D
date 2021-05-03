@@ -12,4 +12,11 @@ public interface Biome {
     List<ConfiguredFeature> getFeatures();
     int rarity();
 
+    /**
+     *
+     * @return how high above surface height terrain will try to generate
+     */
+    default int height() {
+        return 0;
+    }
 }

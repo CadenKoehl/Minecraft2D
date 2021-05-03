@@ -32,6 +32,7 @@ public class Overworld extends World {
                 .addCarvers()
                 .addBiome(Biomes.PLAINS)
                 .addBiome(Biomes.DESERT)
+                .addBiome(Biomes.DESERT_HILLS)
                 .depth(14)
                 .build();
     }

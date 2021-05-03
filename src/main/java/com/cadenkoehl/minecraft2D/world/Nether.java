@@ -1,6 +1,7 @@
 package com.cadenkoehl.minecraft2D.world;
 
 import com.cadenkoehl.minecraft2D.block.Blocks;
+import com.cadenkoehl.minecraft2D.world.biome.Biomes;
 import com.cadenkoehl.minecraft2D.world.biome.NetherWastesBiome;
 import com.cadenkoehl.minecraft2D.world.gen.TerrainGenerator;
 import com.cadenkoehl.minecraft2D.world.gen.feature.ConfiguredFeature;
@@ -28,7 +29,7 @@ public class Nether extends World {
     @Override
     public TerrainGenerator getGenerator() {
         return new TerrainGenerator.Builder(this)
-                .addBiome(new NetherWastesBiome())
+                .addBiome(Biomes.NETHER_WASTES)
                 .defaultBlock(Blocks.NETHERRACK)
                 .depth(14)
                 .build();

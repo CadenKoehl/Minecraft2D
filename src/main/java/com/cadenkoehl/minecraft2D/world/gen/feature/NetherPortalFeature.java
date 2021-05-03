@@ -56,6 +56,6 @@ public class NetherPortalFeature implements ConfiguredFeature {
 
     @Override
     public int rarity() {
-        return 1;
+        return 10;
     }
 }

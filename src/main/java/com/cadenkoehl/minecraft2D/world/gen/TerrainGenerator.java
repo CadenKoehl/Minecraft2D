@@ -12,6 +12,7 @@ import com.cadenkoehl.minecraft2D.world.biome.Biome;
 import com.cadenkoehl.minecraft2D.world.gen.feature.ConfiguredFeature;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public abstract class TerrainGenerator {
@@ -25,11 +26,13 @@ public abstract class TerrainGenerator {
     public final int surfaceHeight = GameFrame.HEIGHT / Tile.BLOCK_SIZE - 2;
     private final World world = this.getWorld();
     private int chunks;
-    private Biome currentBiome;
+    private Biome biome;
     private int chunksInCurrentBiome;
+    private int mountain;
+    private boolean upMountain;
 
     public void genSpawn() {
-        currentBiome = getBiomes().get(0);
+        biome = getBiomes().get(0);
         Logger.log(LogLevel.INFO, "Generating " + world.getDisplayName() + " with seed " + world.getSeed() + "...");
         genChunk(0);
         Logger.log(LogLevel.INFO, "Done!");
@@ -40,8 +43,9 @@ public abstract class TerrainGenerator {
     }
 
     public void genChunk(int chunkX) {
-        chunksInCurrentBiome++;
+        Collections.shuffle(getBiomes());
         nextBiome();
+        chunksInCurrentBiome++;
         chunkX = chunkX * 16;
 
         for(int x = chunkX; x < chunkX + 16; x++) {
@@ -54,20 +58,18 @@ public abstract class TerrainGenerator {
             }
 
             //general terrain
-            gen(currentBiome.getSurfaceBlock(), x, surfaceHeight);
-            gen(currentBiome.getSecondarySurfaceBlock(), x, surfaceHeight + 1);
+            genSurfaceTerrain(x);
             genDefaultBlocks(x);
         }
-        gen(currentBiome.getSecondarySurfaceBlock(), chunkX + 16, surfaceHeight + 1);
         chunks++;
         world.width = world.width + 16;
     }
 
     public void genFeatures(int x) {
-        if(currentBiome.getFeatures() == null) return;
+        if(biome.getFeatures() == null) return;
 
         int xOffset = 2;
-        for(ConfiguredFeature feature : currentBiome.getFeatures()) {
+        for(ConfiguredFeature feature : biome.getFeatures()) {
             if(world.random(feature.rarity() + 1)) {
                 xOffset = xOffset + 5;
                 if(xOffset > 16) return;
@@ -81,21 +83,57 @@ public abstract class TerrainGenerator {
         if(chunksInCurrentBiome < 4) return;
         if(!world.random(2)) return;
 
-        for(Biome biome : this.getBiomes()) {
-            if(biome == currentBiome) continue;
-            if(world.random(biome.rarity() + 1)) {
-                currentBiome = biome;
-                chunksInCurrentBiome = 0;
-                return;
-            }
+        int i = world.getRandom().nextInt(this.getBiomes().size());
+
+        Biome newBiome = this.getBiomes().get(i);
+
+        if(this.biome == newBiome) return;
+
+        if(world.random(biome.rarity() + 1)) {
+            this.biome = newBiome;
+            chunksInCurrentBiome = 0;
+            return;
         }
         chunksInCurrentBiome = 0;
-        currentBiome = this.getBiomes().get(0);
+        biome = this.getBiomes().get(0);
+    }
+
+    private void genSurfaceTerrain(int x) {
+        if(biome.height() < 1) {
+            gen(biome.getSurfaceBlock(), x, surfaceHeight);
+            gen(biome.getSecondarySurfaceBlock(), x, surfaceHeight + 1);
+            return;
+        }
+
+        gen(biome.getSecondarySurfaceBlock(), x, surfaceHeight + 1);
+
+        for(int y = surfaceHeight; y > surfaceHeight - mountain; y--) {
+            gen(biome.getSecondarySurfaceBlock(), x, y);
+        }
+        gen(biome.getSurfaceBlock(), x, surfaceHeight - mountain);
+
+        updateMountains();
+    }
+
+    private void updateMountains() {
+
+        if(world.random(2)) {
+            if(upMountain) mountain++;
+            else mountain--;
+        }
+
+        if(biome.height() == 0) upMountain = false;
+
+        else if(mountain < 0) upMountain = true;
+
+        else if(mountain > biome.height()) {
+            upMountain = false;
+        }
     }
 
     private void genDefaultBlocks(int x) {
         for(int y = 2; y < this.getDepth(); y++) {
-            if(world.random(2) && y < this.getDepth() / 2) gen(currentBiome.getSecondarySurfaceBlock(), x, surfaceHeight + y);
+            if(world.random(2) && y < this.getDepth() / 2) gen(biome.getSecondarySurfaceBlock(), x, surfaceHeight + y);
             else gen(this.getDefaultBlock(), x, surfaceHeight + y);
         }
     }

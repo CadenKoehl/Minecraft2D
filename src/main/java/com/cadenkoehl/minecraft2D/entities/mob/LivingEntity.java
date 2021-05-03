@@ -70,7 +70,6 @@ public abstract class LivingEntity extends Tile {
             portalTicks++;
         }
         else portalTicks = 0;
-        portalTicks = 0;
     }
 
     public void heal() {
