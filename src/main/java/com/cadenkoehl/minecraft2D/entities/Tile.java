@@ -6,6 +6,7 @@ import com.cadenkoehl.minecraft2D.display.GameFrame;
 import com.cadenkoehl.minecraft2D.physics.Vec2d;
 import com.cadenkoehl.minecraft2D.render.Renderer;
 import com.cadenkoehl.minecraft2D.render.Texture;
+import com.cadenkoehl.minecraft2D.world.Chunk;
 import com.cadenkoehl.minecraft2D.world.Nether;
 import com.cadenkoehl.minecraft2D.world.Overworld;
 import com.cadenkoehl.minecraft2D.world.World;
@@ -47,8 +48,6 @@ public abstract class Tile {
     }
 
     public void tick() {
-
-        if(!this.inFrame()) return;
 
         if (pos == null || world == null) return;
 
@@ -165,6 +164,10 @@ public abstract class Tile {
 
     public void setWorld(World world) {
         this.world = world;
+    }
+
+    public Chunk getChunk() {
+        return world.getChunk(pos.x);
     }
 
     public int getHeight() {

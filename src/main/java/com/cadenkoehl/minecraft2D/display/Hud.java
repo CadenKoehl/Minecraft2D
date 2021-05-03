@@ -89,7 +89,6 @@ public class Hud {
             GRAPHICS.drawString("fps: " + Game.getFPS(), 25, 50);
             GRAPHICS.drawString("x: " + player.pos.x, 25, 70);
             GRAPHICS.drawString("y: " + ((-player.pos.y) + 10), 25, 90);
-            GRAPHICS.drawString("blocks: " + player.getWorld().getBlocks().size(), 25, 110);
             GRAPHICS.drawString("entities: " + (player.getWorld().getEntities().size() + 1), 25, 130);
             GRAPHICS.drawString("day " + (Game.getOverworld().days), 25, 150);
         }

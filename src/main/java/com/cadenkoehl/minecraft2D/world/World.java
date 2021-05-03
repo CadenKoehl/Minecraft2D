@@ -23,7 +23,7 @@ import java.util.List;
 
 public abstract class World {
 
-    private final List<Block> blocks;
+    public final List<Chunk> chunks;
     private final List<Tile> entities;
     private final Sun sun;
     public final TerrainGenerator generator;
@@ -41,7 +41,7 @@ public abstract class World {
         this.netherPortals = new ArrayList<>();
         this.seed = seed;
         this.random = new Random(seed);
-        this.blocks = new ArrayList<>();
+        this.chunks = new ArrayList<>();
         this.entities = new ArrayList<>();
         this.generator = this.getGenerator();
         this.sun = new Sun(0, 200, 100, 100);
@@ -84,32 +84,19 @@ public abstract class World {
     public abstract boolean hasDaylightCycle();
 
     public void tick() {
-        try {
-            List<Block> minedBlocks = new ArrayList<>();
-            for(Block block: blocks) {
-                if(block.isMined()) {
-                    minedBlocks.add(block);
-                }
-                block.tick();
+        for(Chunk chunk : chunks) {
+            chunk.tick();
+        }
+        for(Tile entity : new ArrayList<>(entities)) {
+            if(entity instanceof LivingEntity) {
+                if(!((LivingEntity) entity).isAlive()) entities.remove(entity);
             }
-            for(Block block : minedBlocks) {
-                blocks.remove(block);
-            }
+            entity.tick();
+        }
+    }
 
-            List<Tile> deadEntities = new ArrayList<>();
-            for(Tile entity : entities) {
-                if(entity instanceof LivingEntity) {
-                    if(!((LivingEntity) entity).isAlive()) deadEntities.add(entity);
-                }
-                entity.tick();
-            }
-            for(Tile entity : deadEntities) {
-                entities.remove(entity);
-            }
-        }
-        catch (ConcurrentModificationException ex) {
-            //empty catch block
-        }
+    public void addChunk(Chunk chunk) {
+        chunks.add(chunk);
     }
 
     private void updateDaylightCycle() {
@@ -153,14 +140,13 @@ public abstract class World {
     }
 
     /**
-     * @return a block from a given pos
+     * @return a block from a given position
      */
-    public Block getBlock(Vec2d vec2d) {
-        for(Block block : blocks) {
-            if(block == null) continue;
-            if(block.pos.x == vec2d.x && block.pos.y == vec2d.y) return block;
-        }
-        return null;
+    public Block getBlock(Vec2d pos) {
+        if(pos.x / 16 >= chunks.size()) return null;
+
+        Chunk chunk = chunks.get(pos.x / 16);
+        return chunk.getBlock(pos);
     }
 
     public void spawnPortal(int x, int y) {
@@ -184,10 +170,6 @@ public abstract class World {
         }
     }
 
-    public List<Block> getBlocks() {
-        return blocks;
-    }
-
     /**
      * @return a lowercase version of this world's name with spaces replaced by underscores and
      */
@@ -208,8 +190,10 @@ public abstract class World {
         block.setCanCollide(canCollide);
         if(block.pos == null) throw new IllegalStateException("Block has no state yet!");
         if(this.getBlock(block.pos.x, block.pos.y) == null) {
-            blocks.add(block);
-            return true;
+            if(block.pos.x / 16 >= chunks.size()) return false;
+
+            Chunk chunk = chunks.get(block.pos.x / 16);
+            return chunk.setBlock(block);
         }
         return false;
     }
@@ -230,8 +214,18 @@ public abstract class World {
         return seed;
     }
 
+    public Chunk getChunk(int posX) {
+        if(posX / 16 >= chunks.size()) return null;
+
+        return chunks.get(posX / 16);
+    }
+
     public void replaceBlock(Block block, boolean canCollide) {
-        blocks.remove(getBlock(block.pos));
+
+        Chunk chunk = this.getChunk(block.pos.x);
+        if(chunk == null) return;
+
+        chunk.removeBlock(getBlock(block.pos));
         setBlock(block, canCollide);
     }
 
@@ -258,7 +252,10 @@ public abstract class World {
 
         Block brokeBlock = null;
 
-        for(Block block : blocks) {
+        Chunk chunk = this.getChunk(pos.x);
+        if(chunk == null) return null;
+
+        for(Block block : chunk.getBlocks()) {
             if(block.pos.x == pos.x && block.pos.y == pos.y) {
                 brokeBlock = block;
             }
@@ -283,12 +280,18 @@ public abstract class World {
         }
     }
     private void renderBlocks() {
-        for(Block block : blocks) {
-            if(block.screenPos.x - Renderer.CAMERA.offset.x > -50 && block.screenPos.x - Renderer.CAMERA.offset.x < GameFrame.WIDTH) {
-                if(block.screenPos.y - Renderer.CAMERA.offset.y > -50 && block.screenPos.y - Renderer.CAMERA.offset.y < GameFrame.HEIGHT) {
-                    block.render();
-                }
-            }
+        Chunk chunk = Game.getPlayer().getChunk();
+        Chunk chunk2 = this.getChunk(Game.getPlayer().pos.x - 16);
+        Chunk chunk3 = this.getChunk(Game.getPlayer().pos.x + 16);
+
+        if(chunk3 != null) {
+            chunk3.render();
+        }
+        if(chunk2 != null) {
+            chunk2.render();
+        }
+        if(chunk != null) {
+            chunk.render();
         }
     }
     private void renderEntities() {

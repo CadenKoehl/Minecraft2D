@@ -28,6 +28,12 @@ public class Block extends Tile {
         this.texture = new Texture("textures/blocks/" + getName() + ".png");
     }
 
+    @Override
+    public void tick() {
+        if(!this.inFrame()) return;
+        super.tick();
+    }
+
     public Item getItem() {
         return blockItem;
     }

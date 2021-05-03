@@ -7,6 +7,7 @@ import com.cadenkoehl.minecraft2D.entities.Tile;
 import com.cadenkoehl.minecraft2D.physics.Vec2d;
 import com.cadenkoehl.minecraft2D.util.LogLevel;
 import com.cadenkoehl.minecraft2D.util.Logger;
+import com.cadenkoehl.minecraft2D.world.Chunk;
 import com.cadenkoehl.minecraft2D.world.World;
 import com.cadenkoehl.minecraft2D.world.biome.Biome;
 import com.cadenkoehl.minecraft2D.world.gen.feature.ConfiguredFeature;
@@ -47,6 +48,8 @@ public abstract class TerrainGenerator {
         nextBiome();
         chunksInCurrentBiome++;
         chunkX = chunkX * 16;
+
+        world.addChunk(new Chunk());
 
         for(int x = chunkX; x < chunkX + 16; x++) {
 
