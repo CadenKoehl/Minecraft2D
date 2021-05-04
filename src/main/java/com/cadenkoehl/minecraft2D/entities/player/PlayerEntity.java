@@ -19,6 +19,7 @@ public class PlayerEntity extends LivingEntity {
     public final Vec2d originalPos;
     private final Inventory inventory;
     public boolean isInventoryOpen;
+    public Block breakingBlock;
 
     public PlayerEntity(String username, Vec2d vec2d, World world) {
         super(vec2d, world, username);

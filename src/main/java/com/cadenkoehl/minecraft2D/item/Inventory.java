@@ -36,6 +36,10 @@ public class Inventory implements Iterable<ItemStack> {
         }
     }
 
+    public List<ItemStack> getItems() {
+        return items;
+    }
+
     public void decrement(Item item, int amount) {
         for(ItemStack stack : this) {
             if(stack.getItem().getName().equals(item.getName())) {

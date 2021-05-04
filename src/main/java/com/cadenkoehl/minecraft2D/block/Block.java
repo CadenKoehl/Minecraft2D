@@ -64,7 +64,7 @@ public class Block extends Tile {
         if(!this.inFrame()) return;
         if(this.miner != null) {
             if(minedTicks < this.getBreakSpeed() * 90) {
-                if(Input.isMousePressed()) minedTicks++;
+                if(Input.isMousePressed() && this.miner.breakingBlock == this) minedTicks++;
                 else {
                     minedTicks = 0;
                     miner = null;

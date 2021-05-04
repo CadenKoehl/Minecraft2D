@@ -213,7 +213,7 @@ public abstract class World {
     }
 
     public Chunk getChunk(int posX) {
-        if(posX / 16 >= chunks.size()) return null;
+        if(posX / 16 >= chunks.size() || posX < 0) return null;
 
         return chunks.get(posX / 16);
     }
@@ -261,6 +261,7 @@ public abstract class World {
         if(!brokeBlock.canBeMined()) return null;
         if(brokeBlock.minedTicks < brokeBlock.getBreakSpeed() * 9) {
             brokeBlock.miner = player;
+            player.breakingBlock = brokeBlock;
             return null;
         }
         brokeBlock.mine();

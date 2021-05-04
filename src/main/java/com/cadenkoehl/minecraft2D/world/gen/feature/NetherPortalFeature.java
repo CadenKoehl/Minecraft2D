@@ -18,6 +18,7 @@ public class NetherPortalFeature implements ConfiguredFeature {
 
     private void gen(int startX, int startY, World world) {
         //bottom two
+        System.out.println(world);
         world.setBlock(Blocks.OBSIDIAN, new Vec2d(startX, startY - 1));
         world.setBlock(Blocks.OBSIDIAN, new Vec2d(startX + 1, startY - 1));
 

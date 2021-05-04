@@ -10,6 +10,7 @@ import com.cadenkoehl.minecraft2D.render.Renderer;
 import com.cadenkoehl.minecraft2D.render.Texture;
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -43,7 +44,7 @@ public class Hud {
     private void updateInventory() {
 
         int i = 1;
-        for(ItemStack stack : player.getInventory()) {
+        for(ItemStack stack : new ArrayList<>(player.getInventory().getItems())) {
 
             String count = stack == player.getInventory().getSelectedItem() ? stack.getCount() + " <" : String.valueOf(stack.getCount());
 
