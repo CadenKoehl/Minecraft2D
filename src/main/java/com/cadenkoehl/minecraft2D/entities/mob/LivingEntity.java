@@ -1,16 +1,13 @@
 package com.cadenkoehl.minecraft2D.entities.mob;
 
 import com.cadenkoehl.minecraft2D.Game;
-import com.cadenkoehl.minecraft2D.block.Block;
-import com.cadenkoehl.minecraft2D.block.NetherPortalBlock;
+import com.cadenkoehl.minecraft2D.block.BlockState;
 import com.cadenkoehl.minecraft2D.entities.Tile;
 import com.cadenkoehl.minecraft2D.physics.Vec2d;
 import com.cadenkoehl.minecraft2D.util.Util;
-import com.cadenkoehl.minecraft2D.world.Nether;
 import com.cadenkoehl.minecraft2D.world.Overworld;
 import com.cadenkoehl.minecraft2D.world.World;
 
-import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -23,8 +20,8 @@ public abstract class LivingEntity extends Tile {
     private int damageCooldown;
     private int healCooldown;
     public int portalTicks;
-    public Block blockOnHead;
-    public Block blockOnFeet;
+    public BlockState blockOnHead;
+    public BlockState blockOnFeet;
 
     public LivingEntity(Vec2d pos, World world, String displayName) {
         super(pos, world, "entities", displayName);
@@ -125,7 +122,7 @@ public abstract class LivingEntity extends Tile {
 
     public boolean collisionWithBlock(int x, int y) {
 
-        Block block;
+        BlockState block;
 
         if(pos.x == x && pos.y == y) {
             block = blockOnHead;

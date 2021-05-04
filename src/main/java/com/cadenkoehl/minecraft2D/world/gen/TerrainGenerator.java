@@ -1,6 +1,7 @@
 package com.cadenkoehl.minecraft2D.world.gen;
 
 import com.cadenkoehl.minecraft2D.block.Block;
+import com.cadenkoehl.minecraft2D.block.BlockState;
 import com.cadenkoehl.minecraft2D.block.Blocks;
 import com.cadenkoehl.minecraft2D.display.GameFrame;
 import com.cadenkoehl.minecraft2D.entities.Tile;
@@ -149,9 +150,7 @@ public abstract class TerrainGenerator {
 
     private void gen(Block block, int x, int y, boolean canCollide) {
         World world = this.getWorld();
-        Block blockCopy = block.copy();
-        blockCopy.setCanCollide(canCollide);
-        world.setBlock(blockCopy, new Vec2d(x, y));
+        world.setBlock(block, new Vec2d(x, y), canCollide);
     }
 
     private void gen(Block block, int x, int y) {
@@ -159,10 +158,7 @@ public abstract class TerrainGenerator {
     }
 
     private void replace(Block block, int x, int y, boolean canCollide) {
-        Block blockCopy = block.copy();
-        blockCopy.setCanCollide(canCollide);
-        blockCopy.setPos(new Vec2d(x, y));
-        world.replaceBlock(blockCopy);
+        world.replaceBlock(new BlockState(block, new Vec2d(x, y), world), canCollide);
     }
 
     public int getChunks() {

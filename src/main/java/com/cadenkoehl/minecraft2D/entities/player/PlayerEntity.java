@@ -1,9 +1,6 @@
 package com.cadenkoehl.minecraft2D.entities.player;
 
-import com.cadenkoehl.minecraft2D.block.Block;
-import com.cadenkoehl.minecraft2D.block.Blocks;
-import com.cadenkoehl.minecraft2D.display.Hud;
-import com.cadenkoehl.minecraft2D.entities.Tile;
+import com.cadenkoehl.minecraft2D.block.BlockState;
 import com.cadenkoehl.minecraft2D.entities.mob.LivingEntity;
 import com.cadenkoehl.minecraft2D.item.Inventory;
 import com.cadenkoehl.minecraft2D.item.Item;
@@ -12,14 +9,12 @@ import com.cadenkoehl.minecraft2D.physics.Vec2d;
 import com.cadenkoehl.minecraft2D.render.Texture;
 import com.cadenkoehl.minecraft2D.world.World;
 
-import java.util.List;
-
 public class PlayerEntity extends LivingEntity {
 
     public final Vec2d originalPos;
     private final Inventory inventory;
     public boolean isInventoryOpen;
-    public Block breakingBlock;
+    public BlockState breakingBlock;
 
     public PlayerEntity(String username, Vec2d vec2d, World world) {
         super(vec2d, world, username);
@@ -40,16 +35,16 @@ public class PlayerEntity extends LivingEntity {
         return inventory;
     }
 
-    public boolean placeBlock(Vec2d pos, Block block) {
-        if(distanceFrom(pos) <= getReach()) {
-            return this.getWorld().setBlock(block, pos, block.canCollide());
+    public boolean placeBlock(BlockState block) {
+        if(distanceFrom(block.pos) <= getReach()) {
+            return this.getWorld().setBlock(block);
         }
         return false;
     }
 
     public void breakBlock(Vec2d pos) {
         if(distanceFrom(pos) <= getReach()) {
-            Block block = this.getWorld().breakBlock(this, pos);
+            BlockState block = this.getWorld().breakBlock(this, pos);
             if(block == null) return;
 
             inventory.addItem(new ItemStack(block.getItem()));

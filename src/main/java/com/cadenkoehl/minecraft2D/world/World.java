@@ -2,6 +2,7 @@ package com.cadenkoehl.minecraft2D.world;
 
 import com.cadenkoehl.minecraft2D.Game;
 import com.cadenkoehl.minecraft2D.block.Block;
+import com.cadenkoehl.minecraft2D.block.BlockState;
 import com.cadenkoehl.minecraft2D.block.Blocks;
 import com.cadenkoehl.minecraft2D.display.GameFrame;
 import com.cadenkoehl.minecraft2D.entities.Tile;
@@ -140,7 +141,7 @@ public abstract class World {
     /**
      * @return a block from a given position
      */
-    public Block getBlock(Vec2d pos) {
+    public BlockState getBlock(Vec2d pos) {
         if(pos.x / 16 >= chunks.size()) return null;
 
         Chunk chunk = chunks.get(pos.x / 16);
@@ -162,9 +163,7 @@ public abstract class World {
 
     public void lightPortal(List<Vec2d> portal) {
         for(Vec2d pos : portal) {
-            Block copy = Blocks.NETHER_PORTAL.copy();
-            copy.setPos(pos);
-            replaceBlock(copy, false);
+            replaceBlock(new BlockState(Blocks.NETHER_PORTAL, pos, this), false);
         }
     }
 
@@ -178,15 +177,12 @@ public abstract class World {
     /**
      * @return a block from a given location
      */
-    public Block getBlock(int x, int y) {
+    public BlockState getBlock(int x, int y) {
         return this.getBlock(new Vec2d(x, y));
     }
 
-    public boolean setBlock(Block block, boolean canCollide) {
-        block = block.copy();
-        block.setWorld(this);
+    public boolean setBlock(BlockState block, boolean canCollide) {
         block.setCanCollide(canCollide);
-        if(block.pos == null) throw new IllegalStateException("Block has no state yet!");
         if(this.getBlock(block.pos.x, block.pos.y) == null) {
             if(block.pos.x / 16 >= chunks.size()) return false;
 
@@ -218,7 +214,7 @@ public abstract class World {
         return chunks.get(posX / 16);
     }
 
-    public void replaceBlock(Block block, boolean canCollide) {
+    public void replaceBlock(BlockState block, boolean canCollide) {
 
         Chunk chunk = this.getChunk(block.pos.x);
         if(chunk == null) return;
@@ -227,39 +223,37 @@ public abstract class World {
         setBlock(block, canCollide);
     }
 
-    public void replaceBlock(Block block) {
+    public void replaceBlock(BlockState block) {
         replaceBlock(block, true);
     }
 
-    public boolean setBlock(Block block) {
+    public boolean setBlock(BlockState block) {
         return setBlock(block, true);
     }
 
     public boolean setBlock(Block block, Vec2d pos) {
-        block.setPos(pos);
-        return this.setBlock(block);
+        return this.setBlock(new BlockState(block, pos, this));
     }
 
     public boolean setBlock(Block block, Vec2d pos, boolean canCollide) {
-        block.setPos(pos);
-        return this.setBlock(block, canCollide);
+        return this.setBlock(new BlockState(block, pos, this), canCollide);
     }
 
-    public Block breakBlock(PlayerEntity player, Vec2d pos) {
+    public BlockState breakBlock(PlayerEntity player, Vec2d pos) {
 
-        Block brokeBlock = null;
+        BlockState brokeBlock = null;
 
         Chunk chunk = this.getChunk(pos.x);
         if(chunk == null) return null;
 
-        for(Block block : chunk.getBlocks()) {
+        for(BlockState block : chunk.getBlocks()) {
             if(block.pos.x == pos.x && block.pos.y == pos.y) {
                 brokeBlock = block;
             }
         }
         if(brokeBlock == null) return null;
-        if(!brokeBlock.canBeMined()) return null;
-        if(brokeBlock.minedTicks < brokeBlock.getBreakSpeed() * 9) {
+        if(!brokeBlock.getBlock().canBeMined()) return null;
+        if(brokeBlock.minedTicks < brokeBlock.getBlock().getBreakSpeed() * 9) {
             brokeBlock.miner = player;
             player.breakingBlock = brokeBlock;
             return null;

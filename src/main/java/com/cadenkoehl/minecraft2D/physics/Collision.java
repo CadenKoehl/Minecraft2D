@@ -1,15 +1,15 @@
 package com.cadenkoehl.minecraft2D.physics;
 
-import com.cadenkoehl.minecraft2D.block.Block;
+import com.cadenkoehl.minecraft2D.block.BlockState;
 import com.cadenkoehl.minecraft2D.entities.Tile;
 
 public class Collision {
 
     private final Tile tile;
-    private final Block block;
+    private final BlockState block;
     private final Direction direction;
 
-    public Collision(Tile tile, Block block) {
+    public Collision(Tile tile, BlockState block) {
         this.tile = tile;
         this.block = block;
         this.direction = calculateDirection();
@@ -27,7 +27,7 @@ public class Collision {
         return tile;
     }
 
-    public Block getBlock() {
+    public BlockState getBlock() {
         return block;
     }
 

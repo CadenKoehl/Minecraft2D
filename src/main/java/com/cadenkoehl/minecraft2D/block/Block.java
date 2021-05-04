@@ -1,27 +1,59 @@
 package com.cadenkoehl.minecraft2D.block;
 
-import com.cadenkoehl.minecraft2D.display.Input;
-import com.cadenkoehl.minecraft2D.entities.Tile;
-import com.cadenkoehl.minecraft2D.entities.player.PlayerEntity;
 import com.cadenkoehl.minecraft2D.item.BlockItem;
 import com.cadenkoehl.minecraft2D.item.Item;
-import com.cadenkoehl.minecraft2D.physics.Vec2d;
-import com.cadenkoehl.minecraft2D.render.Renderer;
 import com.cadenkoehl.minecraft2D.render.Texture;
-import com.cadenkoehl.minecraft2D.world.World;
 
-public class Block extends Tile {
+public class Block {
 
-    public static final Texture BREAK_0 = new Texture("textures/blocks/destroy_stage_0.png");
-    public static final Texture BREAK_1 = new Texture("textures/blocks/destroy_stage_1.png");
-    public static final Texture BREAK_2 = new Texture("textures/blocks/destroy_stage_2.png");
-    public static final Texture BREAK_3 = new Texture("textures/blocks/destroy_stage_3.png");
-    public static final Texture BREAK_4 = new Texture("textures/blocks/destroy_stage_4.png");
-    public static final Texture BREAK_5 = new Texture("textures/blocks/destroy_stage_5.png");
-    public static final Texture BREAK_6 = new Texture("textures/blocks/destroy_stage_6.png");
-    public static final Texture BREAK_7 = new Texture("textures/blocks/destroy_stage_7.png");
-    public static final Texture BREAK_8 = new Texture("textures/blocks/destroy_stage_8.png");
-    public static final Texture BREAK_9 = new Texture("textures/blocks/destroy_stage_9.png");
+    private static final Texture BREAK_0 = new Texture("textures/blocks/destroy_stage_0.png");
+    private static final Texture BREAK_1 = new Texture("textures/blocks/destroy_stage_1.png");
+    private static final Texture BREAK_2 = new Texture("textures/blocks/destroy_stage_2.png");
+    private static final Texture BREAK_3 = new Texture("textures/blocks/destroy_stage_3.png");
+    private static final Texture BREAK_4 = new Texture("textures/blocks/destroy_stage_4.png");
+    private static final Texture BREAK_5 = new Texture("textures/blocks/destroy_stage_5.png");
+    private static final Texture BREAK_6 = new Texture("textures/blocks/destroy_stage_6.png");
+    private static final Texture BREAK_7 = new Texture("textures/blocks/destroy_stage_7.png");
+    private static final Texture BREAK_8 = new Texture("textures/blocks/destroy_stage_8.png");
+    private static final Texture BREAK_9 = new Texture("textures/blocks/destroy_stage_9.png");
+
+    private final String name;
+    private final String displayName;
+    private final Texture texture;
+    private final Item blockItem;
+    private final int breakSpeed;
+
+    public Block(Settings settings) {
+        this.name = settings.name;
+        this.displayName = settings.displayName;
+        this.blockItem = new BlockItem(new Item.Settings(displayName), this);
+        this.texture = new Texture("textures/blocks/" + name + ".png");
+        this.breakSpeed = settings.breakSpeed;
+    }
+
+    public Texture getTexture() {
+        return texture;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getDisplayName() {
+        return displayName;
+    }
+
+    public Item getBlockItem() {
+        return blockItem;
+    }
+
+    public int getBreakSpeed() {
+        return breakSpeed;
+    }
+
+    public boolean canBeMined() {
+        return breakSpeed >= 0;
+    }
 
     public static Texture breakTexture(int breakLevel) {
         return switch (breakLevel) {
@@ -38,125 +70,22 @@ public class Block extends Tile {
         };
     }
 
-    private boolean canCollide;
-    public PlayerEntity miner;
-    public int minedTicks;
-    private boolean mined;
-    private final BlockItem blockItem;
-    private final Texture texture;
+    public static class Settings {
 
-    public Block(String displayName, Vec2d pos, World world) {
-        super(pos, world, "block", displayName);
-        canCollide = true;
-        this.blockItem = new BlockItem(new Item.Settings(displayName), this);
-        this.texture = new Texture("textures/blocks/" + getName() + ".png");
-    }
+        private final String displayName;
+        private final String name;
 
-    public Block(String displayName, Vec2d pos, World world, boolean canCollide) {
-        super(pos, world, "block", displayName);
-        this.canCollide = canCollide;
-        this.blockItem = new BlockItem(new Item.Settings(displayName), this);
-        this.texture = new Texture("textures/blocks/" + getName() + ".png");
-    }
+        private int breakSpeed;
 
-    @Override
-    public void tick() {
-        if(!this.inFrame()) return;
-        if(this.miner != null) {
-            if(minedTicks < this.getBreakSpeed() * 90) {
-                if(Input.isMousePressed() && this.miner.breakingBlock == this) minedTicks++;
-                else {
-                    minedTicks = 0;
-                    miner = null;
-                }
-            }
-            else {
-                miner.breakBlock(this.pos);
-            }
+        public Settings(String displayName) {
+            this.displayName = displayName;
+            this.name = displayName.replace(" ", "_").toLowerCase();
+            this.breakSpeed = 3;
         }
-        super.tick();
-    }
 
-    @Override
-    public void render() {
-        super.render();
-        if(this.miner != null) {
-            Renderer.render(breakTexture(minedTicks / (this.getBreakSpeed() * 9)), screenPos.x - Renderer.CAMERA.offset.x, screenPos.y - Renderer.CAMERA.offset.y);
+        public Settings breakSpeed(int breakSpeed) {
+            this.breakSpeed = breakSpeed;
+            return this;
         }
-    }
-
-    public Item getItem() {
-        return blockItem;
-    }
-
-    public void setCanCollide(boolean canCollide) {
-        this.canCollide = canCollide;
-    }
-
-    public int getBreakSpeed() {
-        return 3;
-    }
-
-    public boolean canCollide() {
-        return this.canCollide;
-    }
-
-    public boolean canBeMined() {
-        return true;
-    }
-
-    public Block getBlockBehind() {
-        return null;
-    }
-
-    public boolean hasBeenMined() {
-        return mined;
-    }
-
-    public void mine() {
-        if(canBeMined()) {
-            mined = true;
-        }
-    }
-
-    @Override
-    public Texture getTexture() {
-        return texture;
-    }
-
-    public Block copy() {
-        String displayName = this.getDisplayName();
-        return new Block(displayName, pos, getWorld(), this.canCollide) {
-            @Override
-            public String getDisplayName() {
-                return displayName;
-            }
-
-            @Override
-            public Texture getTexture() {
-                return Block.this.getTexture();
-            }
-
-            @Override
-            public boolean canBeMined() {
-                return Block.this.canBeMined();
-            }
-
-            @Override
-            public Item getItem() {
-                return Block.this.getItem();
-            }
-
-            @Override
-            public int getBreakSpeed() {
-                return Block.this.getBreakSpeed();
-            }
-
-            @Override
-            public Block getBlockBehind() {
-                return Block.this.getBlockBehind();
-            }
-
-        };
     }
 }

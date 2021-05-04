@@ -2,7 +2,7 @@ package com.cadenkoehl.minecraft2D.display;
 
 import com.cadenkoehl.minecraft2D.Game;
 import com.cadenkoehl.minecraft2D.GameState;
-import com.cadenkoehl.minecraft2D.block.Block;
+import com.cadenkoehl.minecraft2D.block.BlockState;
 import com.cadenkoehl.minecraft2D.entities.Tile;
 import com.cadenkoehl.minecraft2D.entities.mob.LivingEntity;
 import com.cadenkoehl.minecraft2D.item.Item;
@@ -132,7 +132,7 @@ public class Input {
 
         Vec2d pos = Vec2d.toGamePos(new Vec2d(event.getX() + Renderer.CAMERA.offset.x, event.getY() + Renderer.CAMERA.offset.y));
 
-        Block block = game.player.getWorld().getBlock(pos);
+        BlockState block = game.player.getWorld().getBlock(pos);
         if(block == null) return;
 
         if(block.minedTicks == 0) {

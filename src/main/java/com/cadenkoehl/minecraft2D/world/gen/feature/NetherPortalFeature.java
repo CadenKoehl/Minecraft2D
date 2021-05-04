@@ -2,7 +2,6 @@ package com.cadenkoehl.minecraft2D.world.gen.feature;
 
 import com.cadenkoehl.minecraft2D.Game;
 import com.cadenkoehl.minecraft2D.block.Blocks;
-import com.cadenkoehl.minecraft2D.block.NetherPortalBlock;
 import com.cadenkoehl.minecraft2D.physics.Vec2d;
 import com.cadenkoehl.minecraft2D.world.World;
 

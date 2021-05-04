@@ -1,6 +1,7 @@
 package com.cadenkoehl.minecraft2D.world.biome;
 
 import com.cadenkoehl.minecraft2D.block.Block;
+import com.cadenkoehl.minecraft2D.block.BlockState;
 import com.cadenkoehl.minecraft2D.world.gen.feature.ConfiguredFeature;
 
 import java.util.List;

@@ -1,6 +1,6 @@
 package com.cadenkoehl.minecraft2D.world;
 
-import com.cadenkoehl.minecraft2D.block.Block;
+import com.cadenkoehl.minecraft2D.block.BlockState;
 import com.cadenkoehl.minecraft2D.physics.Vec2d;
 
 import java.util.ArrayList;
@@ -8,41 +8,41 @@ import java.util.List;
 
 public class Chunk {
     
-    private final List<Block> blocks;
+    private final List<BlockState> blocks;
     
     public Chunk() {
         blocks = new ArrayList<>();
     }
 
     public void tick() {
-        for(Block block : new ArrayList<>(blocks)) {
+        for(BlockState block : new ArrayList<>(blocks)) {
             block.tick();
             if(block.hasBeenMined()) blocks.remove(block);
         }
     }
 
     public void render() {
-        for(Block block : blocks) {
+        for(BlockState block : blocks) {
             block.render();
         }
     }
 
-    public boolean setBlock(Block block) {
+    public boolean setBlock(BlockState block) {
         return blocks.add(block);
     }
 
-    public void removeBlock(Block block) {
+    public void removeBlock(BlockState block) {
         blocks.remove(block);
     }
 
-    public Block getBlock(Vec2d pos) {
-        for(Block block : new ArrayList<>(blocks)) {
+    public BlockState getBlock(Vec2d pos) {
+        for(BlockState block : new ArrayList<>(blocks)) {
             if(block.pos.x == pos.x && block.pos.y == pos.y) return block;
         }
         return null;
     }
 
-    public List<Block> getBlocks() {
+    public List<BlockState> getBlocks() {
         return blocks;
     }
 }

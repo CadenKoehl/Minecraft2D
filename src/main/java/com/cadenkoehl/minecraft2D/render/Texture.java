@@ -1,14 +1,10 @@
 package com.cadenkoehl.minecraft2D.render;
 
-import com.cadenkoehl.minecraft2D.block.Block;
-import com.cadenkoehl.minecraft2D.entities.Tile;
-import com.cadenkoehl.minecraft2D.util.LogLevel;
-import com.cadenkoehl.minecraft2D.util.Logger;
+import com.cadenkoehl.minecraft2D.block.BlockState;
 
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
-import java.util.MissingResourceException;
 
 public class Texture {
 
@@ -34,7 +30,7 @@ public class Texture {
     }
 
     public Texture(String filePath) {
-        this(filePath, Block.SIZE_MULTIPLIER);
+        this(filePath, BlockState.SIZE_MULTIPLIER);
     }
 
     private ImageIcon createIcon(String filePath, int sizeMultiplier) {

@@ -1,15 +1,10 @@
 package com.cadenkoehl.minecraft2D.entities;
 
-import com.cadenkoehl.minecraft2D.Game;
-import com.cadenkoehl.minecraft2D.block.Block;
-import com.cadenkoehl.minecraft2D.block.FluidBlock;
 import com.cadenkoehl.minecraft2D.display.GameFrame;
 import com.cadenkoehl.minecraft2D.physics.Vec2d;
 import com.cadenkoehl.minecraft2D.render.Renderer;
 import com.cadenkoehl.minecraft2D.render.Texture;
 import com.cadenkoehl.minecraft2D.world.Chunk;
-import com.cadenkoehl.minecraft2D.world.Nether;
-import com.cadenkoehl.minecraft2D.world.Overworld;
 import com.cadenkoehl.minecraft2D.world.World;
 
 /**

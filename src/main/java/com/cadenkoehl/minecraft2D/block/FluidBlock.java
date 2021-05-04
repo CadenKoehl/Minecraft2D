@@ -1,31 +1,27 @@
 package com.cadenkoehl.minecraft2D.block;
 
+import com.cadenkoehl.minecraft2D.entities.Tile;
 import com.cadenkoehl.minecraft2D.physics.Vec2d;
 import com.cadenkoehl.minecraft2D.render.Texture;
 import com.cadenkoehl.minecraft2D.world.World;
 
 import java.awt.*;
 
-public abstract class FluidBlock extends Block {
+public class FluidBlock extends Block {
 
-    public FluidBlock(String displayName, Vec2d pos, World world) {
-        super(displayName, pos, world);
+    private final Color color;
+
+    public FluidBlock(Color color, Settings settings) {
+        super(settings.breakSpeed(-1));
+        this.color = color;
     }
 
     @Override
     public Texture getTexture() {
-        return new Texture(this.getColor(), BLOCK_SIZE, BLOCK_SIZE);
+        return new Texture(this.getColor(), Tile.BLOCK_SIZE, Tile.BLOCK_SIZE);
     }
 
-    public abstract Color getColor();
-
-    @Override
-    public boolean canCollide() {
-        return false;
-    }
-
-    @Override
-    public boolean canBeMined() {
-        return false;
+    public Color getColor() {
+        return color;
     }
 }
