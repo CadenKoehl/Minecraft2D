@@ -1,6 +1,6 @@
 package com.cadenkoehl.minecraft2D.world;
 
-import com.cadenkoehl.minecraft2D.Game;
+import com.cadenkoehl.minecraft2D.GameClient;
 import com.cadenkoehl.minecraft2D.block.Block;
 import com.cadenkoehl.minecraft2D.block.BlockState;
 import com.cadenkoehl.minecraft2D.block.Blocks;
@@ -27,6 +27,7 @@ public abstract class World {
     private final Sun sun;
     public final TerrainGenerator generator;
     public int width;
+    public int bottomBedrock;
     public int time;
     public int days;
     private static final int sunTravelLength = GameFrame.WIDTH * 2;
@@ -58,12 +59,15 @@ public abstract class World {
     public void startChunkGen() {
         while(true) {
             new Scanner(System.in);
-            if(Game.getPlayer() != null) {
-                if(Game.getPlayer().pos.x > this.width - 12) {
+            if(GameClient.getPlayer() != null) {
+                if(GameClient.getPlayer().pos.x > this.width - 12) {
                     generator.nextChunk();
                 }
             }
         }
+    }
+
+    public void loadChunks() {
     }
 
     private void updateSkyColor() {
@@ -125,6 +129,10 @@ public abstract class World {
         entities.add(entity);
         entity.render();
         entity.updateGraphics();
+    }
+
+    public void removeEntity(Tile entity) {
+        entities.remove(entity);
     }
 
     public Tile getEntity(Vec2d pos) {
@@ -273,9 +281,9 @@ public abstract class World {
         }
     }
     private void renderBlocks() {
-        Chunk chunk = Game.getPlayer().getChunk();
-        Chunk chunk2 = this.getChunk(Game.getPlayer().pos.x - 16);
-        Chunk chunk3 = this.getChunk(Game.getPlayer().pos.x + 16);
+        Chunk chunk = GameClient.getPlayer().getChunk();
+        Chunk chunk2 = this.getChunk(GameClient.getPlayer().pos.x - 16);
+        Chunk chunk3 = this.getChunk(GameClient.getPlayer().pos.x + 16);
 
         if(chunk3 != null) {
             chunk3.render();

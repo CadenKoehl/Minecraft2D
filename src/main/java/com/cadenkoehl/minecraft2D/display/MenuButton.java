@@ -1,6 +1,6 @@
 package com.cadenkoehl.minecraft2D.display;
 
-import com.cadenkoehl.minecraft2D.Game;
+import com.cadenkoehl.minecraft2D.GameClient;
 import com.cadenkoehl.minecraft2D.GameState;
 import com.cadenkoehl.minecraft2D.physics.Vec2d;
 
@@ -25,7 +25,7 @@ public class MenuButton {
             @Override
             public void mouseClicked(MouseEvent e) {
                 if(onClick != null) {
-                    if(e.getX() >= x && e.getX() <= x + width && e.getY() >= y && e.getY() <= y + height && Game.getState() == GameState.TITLE_SCREEN) onClick.run();
+                    if(e.getX() >= x && e.getX() <= x + width && e.getY() >= y && e.getY() <= y + height && GameClient.getState() == GameState.TITLE_SCREEN) onClick.run();
                 }
             }
         });

@@ -82,6 +82,7 @@ public class BlockState extends Tile {
     }
 
     public void mine() {
+        this.getBlock().getBreakSound().play();
         mined = true;
     }
 

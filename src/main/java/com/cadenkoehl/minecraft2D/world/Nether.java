@@ -2,7 +2,6 @@ package com.cadenkoehl.minecraft2D.world;
 
 import com.cadenkoehl.minecraft2D.block.Blocks;
 import com.cadenkoehl.minecraft2D.world.biome.Biomes;
-import com.cadenkoehl.minecraft2D.world.biome.NetherWastesBiome;
 import com.cadenkoehl.minecraft2D.world.gen.TerrainGenerator;
 import com.cadenkoehl.minecraft2D.world.gen.feature.ConfiguredFeature;
 

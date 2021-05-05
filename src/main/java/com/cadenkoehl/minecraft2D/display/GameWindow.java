@@ -1,6 +1,6 @@
 package com.cadenkoehl.minecraft2D.display;
 
-import com.cadenkoehl.minecraft2D.Game;
+import com.cadenkoehl.minecraft2D.GameClient;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -16,10 +16,10 @@ public class GameWindow extends JPanel {
     public static GameWindow INSTANCE = null;
     public static Graphics GRAPHICS = null;
     private final GameFrame FRAME;
-    private final Game game;
+    private final GameClient game;
     public static boolean readyForNextFrame;
 
-    public GameWindow(Game game, GameFrame frame) {
+    public GameWindow(GameClient game, GameFrame frame) {
         Thread.currentThread().setName("Render thread");
         this.FRAME = frame;
         this.game = game;

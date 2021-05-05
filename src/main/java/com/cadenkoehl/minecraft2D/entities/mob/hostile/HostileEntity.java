@@ -1,7 +1,6 @@
 package com.cadenkoehl.minecraft2D.entities.mob.hostile;
 
-import com.cadenkoehl.minecraft2D.Game;
-import com.cadenkoehl.minecraft2D.display.GameWindow;
+import com.cadenkoehl.minecraft2D.GameClient;
 import com.cadenkoehl.minecraft2D.entities.mob.LivingEntity;
 import com.cadenkoehl.minecraft2D.entities.player.PlayerEntity;
 import com.cadenkoehl.minecraft2D.physics.Vec2d;
@@ -26,7 +25,7 @@ public abstract class HostileEntity extends LivingEntity {
 
     public void followPlayer() {
 
-        PlayerEntity player = Game.getPlayer();
+        PlayerEntity player = GameClient.getPlayer();
 
         if(distanceFrom(player) >= getReach() / 3) {
             if(player.pos.x > this.pos.x) {
@@ -52,7 +51,7 @@ public abstract class HostileEntity extends LivingEntity {
     }
 
     public void runAwayFromPlayer() {
-        PlayerEntity player = Game.getPlayer();
+        PlayerEntity player = GameClient.getPlayer();
 
         if(distanceFrom(player) <= player.getReach()) {
             if(player.pos.x > this.pos.x) {

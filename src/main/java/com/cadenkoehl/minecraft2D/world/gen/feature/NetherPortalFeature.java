@@ -1,6 +1,6 @@
 package com.cadenkoehl.minecraft2D.world.gen.feature;
 
-import com.cadenkoehl.minecraft2D.Game;
+import com.cadenkoehl.minecraft2D.GameClient;
 import com.cadenkoehl.minecraft2D.block.Blocks;
 import com.cadenkoehl.minecraft2D.physics.Vec2d;
 import com.cadenkoehl.minecraft2D.world.World;
@@ -11,13 +11,12 @@ public class NetherPortalFeature implements ConfiguredFeature {
 
     @Override
     public void generate(int startX, int startY, World world) {
-        gen(startX, startY, Game.getOverworld());
-        gen(startX, startY, Game.getNether());
+        gen(startX, startY, GameClient.getOverworld());
+        gen(startX, startY, GameClient.getNether());
     }
 
     private void gen(int startX, int startY, World world) {
         //bottom two
-        System.out.println(world);
         world.setBlock(Blocks.OBSIDIAN, new Vec2d(startX, startY - 1));
         world.setBlock(Blocks.OBSIDIAN, new Vec2d(startX + 1, startY - 1));
 

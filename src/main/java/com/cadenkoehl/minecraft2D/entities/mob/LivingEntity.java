@@ -1,6 +1,6 @@
 package com.cadenkoehl.minecraft2D.entities.mob;
 
-import com.cadenkoehl.minecraft2D.Game;
+import com.cadenkoehl.minecraft2D.GameClient;
 import com.cadenkoehl.minecraft2D.block.BlockState;
 import com.cadenkoehl.minecraft2D.entities.Tile;
 import com.cadenkoehl.minecraft2D.physics.Vec2d;
@@ -48,8 +48,8 @@ public abstract class LivingEntity extends Tile {
 
         if(portalTicks > 500) {
             portalTicks = 0;
-            if(this.getWorld() instanceof Overworld) setWorld(Game.getNether());
-            else setWorld(Game.getOverworld());
+            if(this.getWorld() instanceof Overworld) setWorld(GameClient.getNether());
+            else setWorld(GameClient.getOverworld());
         }
 
         if(this.affectedByGravity) {

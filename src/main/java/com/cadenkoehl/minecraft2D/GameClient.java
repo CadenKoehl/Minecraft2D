@@ -12,9 +12,9 @@ import java.util.ConcurrentModificationException;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public abstract class Game {
+public abstract class GameClient {
 
-    private static Game INSTANCE;
+    private static GameClient INSTANCE;
 
     private final GameFrame frame;
     private final GameWindow window;
@@ -31,7 +31,7 @@ public abstract class Game {
     public final Input inputManager;
     public GameState state = GameState.TITLE_SCREEN;
 
-    public Game() {
+    public GameClient() {
 
         Runtime.getRuntime().addShutdownHook(new Thread(this::stop, "Shutdown thread"));
 
@@ -48,7 +48,7 @@ public abstract class Game {
         INSTANCE = this;
     }
 
-    public static Game getInstance() {
+    public static GameClient getInstance() {
         return INSTANCE;
     }
 

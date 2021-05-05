@@ -1,6 +1,6 @@
 package com.cadenkoehl.minecraft2D.display;
 
-import com.cadenkoehl.minecraft2D.Game;
+import com.cadenkoehl.minecraft2D.GameClient;
 import com.cadenkoehl.minecraft2D.GameState;
 import com.cadenkoehl.minecraft2D.block.BlockState;
 import com.cadenkoehl.minecraft2D.entities.Tile;
@@ -17,10 +17,10 @@ import java.awt.event.MouseEvent;
 import java.util.Map;
 
 public class Input {
-    private final Game game;
+    private final GameClient game;
     private static boolean mousePressed;
 
-    public Input(Game game) {
+    public Input(GameClient game) {
         this.game = game;
     }
 

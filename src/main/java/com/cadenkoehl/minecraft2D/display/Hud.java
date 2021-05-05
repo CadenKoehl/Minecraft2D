@@ -1,6 +1,6 @@
 package com.cadenkoehl.minecraft2D.display;
 
-import com.cadenkoehl.minecraft2D.Game;
+import com.cadenkoehl.minecraft2D.GameClient;
 import com.cadenkoehl.minecraft2D.entities.player.PlayerEntity;
 import com.cadenkoehl.minecraft2D.item.Item;
 import com.cadenkoehl.minecraft2D.item.ItemStack;
@@ -77,7 +77,7 @@ public class Hud {
             ItemStack item = player.getInventory().getSelectedItem();
             if (item == null) return;
 
-            Vec2d mouse = Game.getMousePos();
+            Vec2d mouse = GameClient.getMousePos();
 
             if (mouse == null) return;
 
@@ -87,11 +87,11 @@ public class Hud {
 
     private void updateF3() {
         if(f3) {
-            GRAPHICS.drawString("fps: " + Game.getFPS(), 25, 50);
+            GRAPHICS.drawString("fps: " + GameClient.getFPS(), 25, 50);
             GRAPHICS.drawString("x: " + player.pos.x, 25, 70);
             GRAPHICS.drawString("y: " + ((-player.pos.y) + 10), 25, 90);
-            GRAPHICS.drawString("entities: " + (player.getWorld().getEntities().size() + 1), 25, 130);
-            GRAPHICS.drawString("day " + (Game.getOverworld().days), 25, 150);
+            GRAPHICS.drawString("entities: " + (player.getWorld().getEntities().size()), 25, 110);
+            GRAPHICS.drawString("day " + (GameClient.getOverworld().days), 25, 130);
         }
     }
 }

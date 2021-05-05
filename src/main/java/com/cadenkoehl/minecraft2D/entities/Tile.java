@@ -36,7 +36,7 @@ public abstract class Tile {
         this.world = world;
         this.displayName = displayName;
         this.name = displayName.replace(" ", "_").toLowerCase();
-        this.texture = new Texture("textures/" + textureCategory + "/" + name + ".png");
+        this.texture = new Texture("resources/textures/" + textureCategory + "/" + name + ".png");
         this.height = texture.getHeight();
         this.width = texture.getWidth();
         this.blockHeight = height / BLOCK_SIZE;
@@ -159,7 +159,9 @@ public abstract class Tile {
     }
 
     public void setWorld(World world) {
+        this.world.removeEntity(this);
         this.world = world;
+        this.world.spawnEntity(this);
     }
 
     public Chunk getChunk() {

@@ -1,5 +1,7 @@
 package com.cadenkoehl.minecraft2D.item;
 
+import net.querz.nbt.tag.CompoundTag;
+
 public class ItemStack {
 
     private final Item item;
@@ -25,6 +27,13 @@ public class ItemStack {
         }
 
         this.count = count;
+    }
+
+    public CompoundTag createCompoundTag() {
+        CompoundTag tag = new CompoundTag();
+        tag.putString("Item", item.getName());
+        tag.putInt("Count", this.count);
+        return tag;
     }
 
     public void setInventory(Inventory inventory) {

@@ -17,7 +17,9 @@ public class Chunk {
     public void tick() {
         for(BlockState block : new ArrayList<>(blocks)) {
             block.tick();
-            if(block.hasBeenMined()) blocks.remove(block);
+            if(block.hasBeenMined()) {
+                blocks.remove(block);
+            }
         }
     }
 

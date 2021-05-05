@@ -1,5 +1,6 @@
 package com.cadenkoehl.minecraft2D.world.gen.feature;
 
+import com.cadenkoehl.minecraft2D.block.Block;
 import com.cadenkoehl.minecraft2D.block.FluidBlock;
 import com.cadenkoehl.minecraft2D.physics.Vec2d;
 import com.cadenkoehl.minecraft2D.world.World;
@@ -7,9 +8,9 @@ import com.cadenkoehl.minecraft2D.world.gen.feature.ConfiguredFeature;
 
 public class LakeFeature implements ConfiguredFeature {
 
-    private final FluidBlock fluid;
+    private final Block fluid;
 
-    public LakeFeature(FluidBlock fluid) {
+    public LakeFeature(Block fluid) {
         this.fluid = fluid;
     }
 
