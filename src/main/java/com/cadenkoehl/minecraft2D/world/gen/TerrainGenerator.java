@@ -6,13 +6,15 @@ import com.cadenkoehl.minecraft2D.block.Blocks;
 import com.cadenkoehl.minecraft2D.display.GameFrame;
 import com.cadenkoehl.minecraft2D.entities.Tile;
 import com.cadenkoehl.minecraft2D.physics.Vec2d;
-import com.cadenkoehl.minecraft2D.util.LogLevel;
-import com.cadenkoehl.minecraft2D.util.Logger;
 import com.cadenkoehl.minecraft2D.world.Chunk;
 import com.cadenkoehl.minecraft2D.world.World;
 import com.cadenkoehl.minecraft2D.world.biome.Biome;
 import com.cadenkoehl.minecraft2D.world.gen.feature.ConfiguredFeature;
+import net.querz.nbt.io.NBTUtil;
+import net.querz.nbt.tag.CompoundTag;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -33,11 +35,11 @@ public abstract class TerrainGenerator {
     private int mountain;
     private boolean upMountain;
 
-    public void genSpawn() {
-        biome = getBiomes().get(0);
-        Logger.log(LogLevel.INFO, "Generating " + world.getDisplayName() + " with seed " + world.getSeed() + "...");
-        genChunk(0);
-        Logger.log(LogLevel.INFO, "Done!");
+    public TerrainGenerator() {
+
+        int i = world.getRandom().nextInt(getBiomes().size());
+
+        biome = getBiomes().get(i);
     }
 
     public void nextChunk() {
@@ -45,12 +47,34 @@ public abstract class TerrainGenerator {
     }
 
     public void genChunk(int chunkX) {
+        world.addChunk(new Chunk());
+
+        File file = new File("data/" + world.getName() + "/chunks/chunk_" + chunkX + ".dat");
+
+        chunkX = chunkX * 16;
+        world.width = world.width + 16;
+        chunks++;
+
+        if(file.exists()) {
+            CompoundTag tag;
+
+            try {
+                tag = (CompoundTag) NBTUtil.read(file).getTag();
+            } catch (IOException e) {
+                e.printStackTrace();
+                return;
+            }
+
+            tag.forEach(entry -> {
+                String[] pos = entry.getKey().split(":");
+                world.setBlock(new BlockState((CompoundTag) entry.getValue(), new Vec2d(Integer.parseInt(pos[0]), Integer.parseInt(pos[1])), world));
+            });
+            return;
+        }
+
         Collections.shuffle(getBiomes());
         nextBiome();
         chunksInCurrentBiome++;
-        chunkX = chunkX * 16;
-
-        world.addChunk(new Chunk());
 
         for(int x = chunkX; x < chunkX + 16; x++) {
 
@@ -65,8 +89,6 @@ public abstract class TerrainGenerator {
             genSurfaceTerrain(x);
             genDefaultBlocks(x);
         }
-        chunks++;
-        world.width = world.width + 16;
     }
 
     public void genFeatures(int x) {

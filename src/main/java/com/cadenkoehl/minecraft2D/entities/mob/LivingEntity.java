@@ -60,10 +60,10 @@ public abstract class LivingEntity extends Tile {
             heal();
         }
 
-        if(blockOnHead != null && blockOnHead.getName().equals("nether_portal")) {
+        if(blockOnHead != null && blockOnHead.getName().equals("nether_portal") && blockOnHead.isVisible()) {
             portalTicks++;
         }
-        else if(blockOnFeet != null && blockOnFeet.getName().equals("nether_portal")) {
+        else if(blockOnFeet != null && blockOnFeet.getName().equals("nether_portal") && blockOnHead.isVisible()) {
             portalTicks++;
         }
         else portalTicks = 0;

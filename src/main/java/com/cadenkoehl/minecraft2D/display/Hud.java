@@ -86,12 +86,15 @@ public class Hud {
     }
 
     private void updateF3() {
+
+        int x = GameFrame.WIDTH - 100;
+
         if(f3) {
-            GRAPHICS.drawString("fps: " + GameClient.getFPS(), 25, 50);
-            GRAPHICS.drawString("x: " + player.pos.x, 25, 70);
-            GRAPHICS.drawString("y: " + ((-player.pos.y) + 10), 25, 90);
-            GRAPHICS.drawString("entities: " + (player.getWorld().getEntities().size()), 25, 110);
-            GRAPHICS.drawString("day " + (GameClient.getOverworld().days), 25, 130);
+            GRAPHICS.drawString("fps: " + GameClient.getFPS(), x, 50);
+            GRAPHICS.drawString("x: " + player.pos.x, x, 70);
+            GRAPHICS.drawString("y: " + ((-player.pos.y) + 10), x, 90);
+            GRAPHICS.drawString("entities: " + (player.getWorld().getEntities().size()), x, 110);
+            GRAPHICS.drawString("day " + (GameClient.getOverworld().days), x, 130);
         }
     }
 }

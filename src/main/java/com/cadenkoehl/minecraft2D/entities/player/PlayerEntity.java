@@ -2,10 +2,7 @@ package com.cadenkoehl.minecraft2D.entities.player;
 
 import com.cadenkoehl.minecraft2D.block.BlockState;
 import com.cadenkoehl.minecraft2D.entities.mob.LivingEntity;
-import com.cadenkoehl.minecraft2D.item.Inventory;
-import com.cadenkoehl.minecraft2D.item.Item;
-import com.cadenkoehl.minecraft2D.item.ItemStack;
-import com.cadenkoehl.minecraft2D.item.Items;
+import com.cadenkoehl.minecraft2D.item.*;
 import com.cadenkoehl.minecraft2D.physics.Vec2d;
 import com.cadenkoehl.minecraft2D.render.Texture;
 import com.cadenkoehl.minecraft2D.world.World;
@@ -52,8 +49,8 @@ public class PlayerEntity extends LivingEntity {
         if(distanceFrom(block.pos) <= getReach()) {
             if(this.getWorld().setBlock(block)) {
                 block.getBlock().getBreakSound().play();
+                return true;
             }
-            return true;
         }
         return false;
     }
@@ -63,7 +60,10 @@ public class PlayerEntity extends LivingEntity {
             BlockState block = this.getWorld().breakBlock(this, pos);
             if(block == null) return;
 
-            inventory.addItem(new ItemStack(block.getItem()));
+            LootTable lootTable = block.getBlock().getLootTable();
+            if(lootTable == null) return;
+
+            inventory.addItem(lootTable.dropItem());
         }
     }
 

@@ -3,11 +3,8 @@ package com.cadenkoehl.minecraft2D.world;
 import com.cadenkoehl.minecraft2D.block.Blocks;
 import com.cadenkoehl.minecraft2D.world.biome.Biomes;
 import com.cadenkoehl.minecraft2D.world.gen.TerrainGenerator;
-import com.cadenkoehl.minecraft2D.world.gen.feature.ConfiguredFeature;
 
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.List;
 
 public class Nether extends World {
 
@@ -32,11 +29,6 @@ public class Nether extends World {
                 .defaultBlock(Blocks.NETHERRACK)
                 .depth(14)
                 .build();
-    }
-
-    @Override
-    public List<ConfiguredFeature> getFeatures() {
-        return new ArrayList<>();
     }
 
     @Override

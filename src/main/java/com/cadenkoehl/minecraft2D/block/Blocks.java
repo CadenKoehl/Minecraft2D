@@ -1,5 +1,7 @@
 package com.cadenkoehl.minecraft2D.block;
 
+import com.cadenkoehl.minecraft2D.item.Items;
+import com.cadenkoehl.minecraft2D.item.LootTable;
 import com.cadenkoehl.minecraft2D.sound.SoundEvents;
 
 import java.awt.*;
@@ -19,10 +21,10 @@ public class Blocks {
     public static final Block LEAF_BLOCK = register(new Block.Settings("Leaf Block").breakSound(SoundEvents.GRASS_BREAK).breakSpeed(1));
     public static final Block STONE = register(new Block.Settings("Stone"));
     public static final Block CACTUS = register(new Block.Settings("Cactus").breakSound(SoundEvents.GRASS_BREAK));
-    public static final Block GRAVEL = register(new Block.Settings("Gravel").breakSound(SoundEvents.GRASS_BREAK));
+    public static final Block GRAVEL = register(new Block.Settings("Gravel").breakSound(SoundEvents.GRASS_BREAK).addDrop(new LootTable.Entry(Items.FLINT, 10, 1, 1)));
     public static final FluidBlock WATER = register(new FluidBlock(new Color(0, 123, 255, 70), new Block.Settings("Water")));
     public static final Block OBSIDIAN = register(new Block.Settings("Obsidian").breakSpeed(-1));
-    public static final Block NETHER_PORTAL = register(new Block.Settings("Nether Portal"));
+    public static final Block NETHER_PORTAL = register(new Block.Settings("Nether Portal").defaultCanCollide(false).breakSpeed(-1));
     public static final Block NETHERRACK = register(new Block.Settings("Netherrack"));
     public static final Block SOUL_SAND = register(new Block.Settings("Soul Sand").breakSound(SoundEvents.GRASS_BREAK));
     public static final Block BEDROCK = register(new Block.Settings("Bedrock").breakSpeed(-1));

@@ -38,11 +38,6 @@ public class Overworld extends World {
     }
 
     @Override
-    public List<ConfiguredFeature> getFeatures() {
-        return new ArrayList<>();
-    }
-
-    @Override
     public boolean hasDaylightCycle() {
         return true;
     }

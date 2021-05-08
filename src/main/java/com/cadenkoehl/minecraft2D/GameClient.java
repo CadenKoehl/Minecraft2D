@@ -41,8 +41,11 @@ public abstract class GameClient {
         frame.setVisible(true);
         MenuButton singleplayer = new MenuButton("Singleplayer", GameFrame.WIDTH / 3, GameFrame.HEIGHT / 3, 300, 100);
         singleplayer.onClick(this::init);
+        MenuButton multiplayer = new MenuButton("Multiplayer", GameFrame.WIDTH / 3, (GameFrame.HEIGHT / 3) + 100, 300, 100);
+
         titleScreen = new TitleScreen();
         titleScreen.add(singleplayer);
+        titleScreen.add(multiplayer);
         this.inputManager = new Input(this);
         scheduleFPSTimer();
         INSTANCE = this;
@@ -65,9 +68,6 @@ public abstract class GameClient {
     }
 
     public static Nether getNether() {
-        if(INSTANCE.nether == null) {
-            INSTANCE.nether = new Nether(System.nanoTime());
-        }
         return INSTANCE.nether;
     }
 

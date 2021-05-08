@@ -32,12 +32,12 @@ public class Item {
         return name;
     }
 
-    public ClickResult onClick(PlayerEntity player, Vec2d clickPos) {
-        return ClickResult.FAILED;
-    }
-
     public Texture getTexture() {
         return texture;
+    }
+
+    public ClickResult onClick(PlayerEntity player, Vec2d clickPos) {
+        return ClickResult.FAILED;
     }
 
     public enum ClickResult {

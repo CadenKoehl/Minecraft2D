@@ -9,25 +9,26 @@ import com.cadenkoehl.minecraft2D.entities.Tile;
 import com.cadenkoehl.minecraft2D.entities.mob.LivingEntity;
 import com.cadenkoehl.minecraft2D.entities.player.PlayerEntity;
 import com.cadenkoehl.minecraft2D.physics.Vec2d;
-import com.cadenkoehl.minecraft2D.util.LogLevel;
-import com.cadenkoehl.minecraft2D.util.Logger;
 import com.cadenkoehl.minecraft2D.util.Util;
 import com.cadenkoehl.minecraft2D.world.gen.TerrainGenerator;
-import com.cadenkoehl.minecraft2D.world.gen.feature.ConfiguredFeature;
-import com.cadenkoehl.minecraft2D.world.gen.feature.NetherPortalFeature;
+import net.querz.nbt.io.NBTUtil;
+import net.querz.nbt.io.NamedTag;
+import net.querz.nbt.tag.CompoundTag;
 
 import java.awt.*;
+import java.io.File;
 import java.util.*;
 import java.util.List;
 
 public abstract class World {
 
-    public final List<Chunk> chunks;
+    public final List<Chunk> chunksPos;
+    public final List<Chunk> chunksNeg;
+
     private final List<Tile> entities;
     private final Sun sun;
     public final TerrainGenerator generator;
     public int width;
-    public int bottomBedrock;
     public int time;
     public int days;
     private static final int sunTravelLength = GameFrame.WIDTH * 2;
@@ -35,19 +36,17 @@ public abstract class World {
     private final Random random;
     public Color skyColor;
     private final long seed;
-    public final List<List<Vec2d>> netherPortals;
 
     public World(long seed) {
-        this.netherPortals = new ArrayList<>();
         this.seed = seed;
         this.random = new Random(seed);
-        this.chunks = new ArrayList<>();
+        this.chunksPos = new ArrayList<>();
+        this.chunksNeg = new ArrayList<>();
         this.entities = new ArrayList<>();
         this.generator = this.getGenerator();
         this.sun = new Sun(0, 200, 100, 100);
         time = 0;
         days = 1;
-        this.genSpawnTerrain();
         if(this.hasDaylightCycle()) {
             Util.scheduleTask(this::updateDaylightCycle, dayLength);
         }
@@ -67,7 +66,21 @@ public abstract class World {
         }
     }
 
-    public void loadChunks() {
+    public void saveChunks() {
+        for (int i = 0, chunksSize = chunksPos.size(); i < chunksSize; i++) {
+            Chunk chunk = chunksPos.get(i);
+            CompoundTag chunkTag = new CompoundTag();
+            for (BlockState block : chunk.getBlocks()) {
+                chunkTag.put(block.pos.x + ":" + block.pos.y, block.getTag());
+            }
+            try {
+                File dir = new File("data/" + this.getName() + "/chunks/");
+                dir.mkdirs();
+                NBTUtil.write(new NamedTag("Data", chunkTag), "data/" + this.getName() + "/chunks/chunk_" + i + ".dat");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     private void updateSkyColor() {
@@ -83,11 +96,10 @@ public abstract class World {
     public abstract String getDisplayName();
     public abstract Color getSkyColor();
     public abstract TerrainGenerator getGenerator();
-    public abstract List<ConfiguredFeature> getFeatures();
     public abstract boolean hasDaylightCycle();
 
     public void tick() {
-        for(Chunk chunk : chunks) {
+        for(Chunk chunk : chunksPos) {
             chunk.tick();
         }
         for(Tile entity : new ArrayList<>(entities)) {
@@ -99,7 +111,7 @@ public abstract class World {
     }
 
     public void addChunk(Chunk chunk) {
-        chunks.add(chunk);
+        chunksPos.add(chunk);
     }
 
     private void updateDaylightCycle() {
@@ -119,10 +131,6 @@ public abstract class World {
 
     public boolean isDay() {
         return !isNight() && this.hasDaylightCycle();
-    }
-
-    public void genSpawnTerrain() {
-        generator.genSpawn();
     }
 
     public void spawnEntity(Tile entity) {
@@ -150,23 +158,10 @@ public abstract class World {
      * @return a block from a given position
      */
     public BlockState getBlock(Vec2d pos) {
-        if(pos.x / 16 >= chunks.size()) return null;
+        Chunk chunk = this.getChunk(pos.x);
+        if(chunk == null) return null;
 
-        Chunk chunk = chunks.get(pos.x / 16);
-        return chunk.getBlock(pos);
-    }
-
-    public void spawnPortal(int x, int y) {
-        new NetherPortalFeature().generate(x, y, this);
-        for(List<Vec2d> portal : netherPortals) {
-            for(Vec2d pos : portal) {
-                if(pos.x == x && pos.y == y) {
-                    lightPortal(portal);
-                    return;
-                }
-            }
-        }
-        Logger.log(LogLevel.WARN, "Failed to light portal at " + x + " " + y);
+        return chunk.getBlock(new Vec2d(pos.x, pos.y));
     }
 
     public void lightPortal(List<Vec2d> portal) {
@@ -192,9 +187,10 @@ public abstract class World {
     public boolean setBlock(BlockState block, boolean canCollide) {
         block.setCanCollide(canCollide);
         if(this.getBlock(block.pos.x, block.pos.y) == null) {
-            if(block.pos.x / 16 >= chunks.size()) return false;
+            if(block.pos.x / 16 >= chunksPos.size()) return false;
 
-            Chunk chunk = chunks.get(block.pos.x / 16);
+            Chunk chunk = this.getChunk(block.pos.x);
+            if(chunk == null) return false;
             return chunk.setBlock(block);
         }
         return false;
@@ -217,9 +213,18 @@ public abstract class World {
     }
 
     public Chunk getChunk(int posX) {
-        if(posX / 16 >= chunks.size() || posX < 0) return null;
+        int chunkX = posX / 16;
 
-        return chunks.get(posX / 16);
+        if(chunkX >= chunksPos.size() && chunkX <= chunksNeg.size()) return null;
+
+        if(chunkX >= 0) {
+            if(chunkX >= chunksPos.size()) return null;
+            return chunksPos.get(chunkX);
+        }
+        else {
+            if(-chunkX >= chunksNeg.size()) return null;
+            return chunksNeg.get(-chunkX);
+        }
     }
 
     public void replaceBlock(BlockState block, boolean canCollide) {
@@ -236,7 +241,7 @@ public abstract class World {
     }
 
     public boolean setBlock(BlockState block) {
-        return setBlock(block, true);
+        return setBlock(block, block.canCollide());
     }
 
     public boolean setBlock(Block block, Vec2d pos) {

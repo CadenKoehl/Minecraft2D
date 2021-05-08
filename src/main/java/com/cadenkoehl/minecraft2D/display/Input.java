@@ -129,6 +129,7 @@ public class Input {
 
     public void onMouseDragged(MouseEvent event) {
         if(game.state != GameState.GAME) return;
+        if(event.getButton() != MouseEvent.BUTTON1) return;
 
         Vec2d pos = Vec2d.toGamePos(new Vec2d(event.getX() + Renderer.CAMERA.offset.x, event.getY() + Renderer.CAMERA.offset.y));
 

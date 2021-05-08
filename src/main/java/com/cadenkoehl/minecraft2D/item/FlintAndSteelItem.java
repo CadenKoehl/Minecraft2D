@@ -1,9 +1,9 @@
 package com.cadenkoehl.minecraft2D.item;
 
+import com.cadenkoehl.minecraft2D.block.BlockState;
+import com.cadenkoehl.minecraft2D.block.Blocks;
 import com.cadenkoehl.minecraft2D.entities.player.PlayerEntity;
 import com.cadenkoehl.minecraft2D.physics.Vec2d;
-
-import java.util.List;
 
 public class FlintAndSteelItem extends Item {
 
@@ -13,14 +13,17 @@ public class FlintAndSteelItem extends Item {
 
     @Override
     public ClickResult onClick(PlayerEntity player, Vec2d pos) {
-        for(List<Vec2d> portal : player.getWorld().netherPortals) {
-            for(Vec2d portalBlockPos : portal) {
-                if(pos.x == portalBlockPos.x && pos.y == portalBlockPos.y) {
-                    player.getWorld().lightPortal(portal);
-                    return ClickResult.SUCCESS;
-                }
+
+        boolean success = false;
+
+        for(BlockState state : player.getChunk().getBlocks()) {
+            if(state.getBlock() == Blocks.NETHER_PORTAL) {
+                success = true;
+                state.setVisible(true);
             }
         }
-        return ClickResult.FAILED;
+
+        if(success) return ClickResult.SUCCESS;
+        else return ClickResult.FAILED;
     }
 }

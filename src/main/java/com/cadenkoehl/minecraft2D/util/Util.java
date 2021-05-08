@@ -21,4 +21,7 @@ public class Util {
         int random = (int) Math.round(Math.random() * Math.abs(chance));
         return random == 1;
     }
+    public static int randomIntBetween(int min, int max) {
+        return (int) Math.round(Math.random() * (max - min) + min);
+    }
 }

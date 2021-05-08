@@ -7,9 +7,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Chunk {
-    
+
     private final List<BlockState> blocks;
-    
+
     public Chunk() {
         blocks = new ArrayList<>();
     }

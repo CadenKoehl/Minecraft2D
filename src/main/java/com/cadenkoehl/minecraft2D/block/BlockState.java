@@ -9,6 +9,7 @@ import com.cadenkoehl.minecraft2D.physics.Vec2d;
 import com.cadenkoehl.minecraft2D.render.Renderer;
 import com.cadenkoehl.minecraft2D.render.Texture;
 import com.cadenkoehl.minecraft2D.world.World;
+import net.querz.nbt.tag.CompoundTag;
 
 /**
  * Represents a block that has been placed in the world.
@@ -17,6 +18,7 @@ public class BlockState extends Tile {
 
     private final Block block;
     private boolean canCollide;
+    private boolean visible;
     public PlayerEntity miner;
     public int minedTicks;
     private boolean mined;
@@ -24,15 +26,20 @@ public class BlockState extends Tile {
     private final Texture texture;
 
     public BlockState(Block block, Vec2d pos, World world) {
-        this(block, pos, world, true);
+        this(block, pos, world, true, (block != Blocks.NETHER_PORTAL));
     }
 
-    public BlockState(Block block, Vec2d pos, World world, boolean canCollide) {
+    public BlockState(Block block, Vec2d pos, World world, boolean canCollide, boolean visibile) {
         super(pos, world, "block", block.getDisplayName());
         this.block = block;
         this.canCollide = canCollide;
         this.blockItem = new BlockItem(new Item.Settings(this.block.getDisplayName()), this.block);
         this.texture = this.block.getTexture();
+        this.visible = visibile;
+    }
+
+    public BlockState(CompoundTag tag, Vec2d pos, World world) {
+        this(Blocks.valueOf(tag.getString("Name")), pos, world, tag.getBoolean("CanCollide"), tag.getBoolean("Visible"));
     }
 
     @Override
@@ -55,10 +62,20 @@ public class BlockState extends Tile {
 
     @Override
     public void render() {
-        super.render();
-        if(this.miner != null) {
-            Renderer.render(Block.breakTexture(minedTicks / (this.block.getBreakSpeed() * 9)), screenPos.x - Renderer.CAMERA.offset.x, screenPos.y - Renderer.CAMERA.offset.y);
+        if(this.visible) {
+            super.render();
+            if(this.miner != null) {
+                Renderer.render(Block.getBreakTexture(minedTicks / (this.block.getBreakSpeed() * 9)), screenPos.x - Renderer.CAMERA.offset.x, screenPos.y - Renderer.CAMERA.offset.y);
+            }
         }
+    }
+
+    public CompoundTag getTag() {
+        CompoundTag tag = new CompoundTag();
+        tag.putString("Name", block.getName());
+        tag.putBoolean("CanCollide", canCollide);
+        tag.putBoolean("Visible", visible);
+        return tag;
     }
 
     public Block getBlock() {
@@ -73,8 +90,16 @@ public class BlockState extends Tile {
         this.canCollide = canCollide;
     }
 
+    public void setVisible(boolean visible) {
+        this.visible = visible;
+    }
+
+    public boolean isVisible() {
+        return visible;
+    }
+
     public boolean canCollide() {
-        return this.canCollide;
+        return this.canCollide && block.getDefaultCanCollide();
     }
 
     public boolean hasBeenMined() {

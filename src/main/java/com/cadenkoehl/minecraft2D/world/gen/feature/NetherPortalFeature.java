@@ -5,8 +5,6 @@ import com.cadenkoehl.minecraft2D.block.Blocks;
 import com.cadenkoehl.minecraft2D.physics.Vec2d;
 import com.cadenkoehl.minecraft2D.world.World;
 
-import java.util.List;
-
 public class NetherPortalFeature implements ConfiguredFeature {
 
     @Override
@@ -40,17 +38,14 @@ public class NetherPortalFeature implements ConfiguredFeature {
         world.setBlock(Blocks.OBSIDIAN, new Vec2d(startX, startY - 5));
         world.setBlock(Blocks.OBSIDIAN, new Vec2d(startX + 1, startY - 5));
 
+        world.setBlock(Blocks.NETHER_PORTAL, new Vec2d(startX, startY - 2));
+        world.setBlock(Blocks.NETHER_PORTAL, new Vec2d(startX, startY - 3));
+        world.setBlock(Blocks.NETHER_PORTAL, new Vec2d(startX, startY - 4));
 
-        //inside portal checkers
-        world.netherPortals.add(List.of(
-                new Vec2d(startX, startY - 2),
-                new Vec2d(startX, startY - 3),
-                new Vec2d(startX, startY - 4),
+        world.setBlock(Blocks.NETHER_PORTAL, new Vec2d(startX + 1, startY - 2));
+        world.setBlock(Blocks.NETHER_PORTAL, new Vec2d(startX + 1, startY - 3));
+        world.setBlock(Blocks.NETHER_PORTAL, new Vec2d(startX + 1, startY - 4));
 
-                new Vec2d(startX + 1, startY - 2),
-                new Vec2d(startX + 1, startY - 3),
-                new Vec2d(startX + 1, startY - 4)
-        ));
     }
 
     @Override

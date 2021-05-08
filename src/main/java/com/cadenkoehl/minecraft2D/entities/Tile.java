@@ -1,5 +1,7 @@
 package com.cadenkoehl.minecraft2D.entities;
 
+import com.cadenkoehl.minecraft2D.block.BlockState;
+import com.cadenkoehl.minecraft2D.block.Blocks;
 import com.cadenkoehl.minecraft2D.display.GameFrame;
 import com.cadenkoehl.minecraft2D.physics.Vec2d;
 import com.cadenkoehl.minecraft2D.render.Renderer;
@@ -162,6 +164,11 @@ public abstract class Tile {
         this.world.removeEntity(this);
         this.world = world;
         this.world.spawnEntity(this);
+        for(BlockState state : this.getChunk().getBlocks()) {
+            if(state.getBlock() == Blocks.NETHER_PORTAL) {
+                state.setVisible(true);
+            }
+        }
     }
 
     public Chunk getChunk() {

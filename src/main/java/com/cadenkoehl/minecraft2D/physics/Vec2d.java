@@ -4,8 +4,6 @@ import com.cadenkoehl.minecraft2D.entities.Tile;
 
 public class Vec2d {
 
-    public static final Vec2d DEFAULT = new Vec2d(0, 0);
-
     public static Vec2d toScreenPos(Vec2d gamePos) {
         return new Vec2d(gamePos.x * Tile.BLOCK_SIZE, gamePos.y * Tile.BLOCK_SIZE);
     }

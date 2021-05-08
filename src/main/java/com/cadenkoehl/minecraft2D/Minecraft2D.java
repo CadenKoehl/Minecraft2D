@@ -9,6 +9,7 @@ import com.cadenkoehl.minecraft2D.render.Texture;
 import com.cadenkoehl.minecraft2D.server.Minecraft2DServer;
 import com.cadenkoehl.minecraft2D.util.LogLevel;
 import com.cadenkoehl.minecraft2D.util.Logger;
+import com.cadenkoehl.minecraft2D.world.Nether;
 import com.cadenkoehl.minecraft2D.world.Overworld;
 
 public class Minecraft2D extends GameClient {
@@ -30,6 +31,8 @@ public class Minecraft2D extends GameClient {
         player = new PlayerEntity("Player", new Vec2d(17, 4), currentWorld);
         overworld.spawnEntity(player);
 
+        nether = new Nether(System.nanoTime());
+        
         hud = new Hud(player);
         new Thread(this::startGameLoop, "Game thread").start();
     }
@@ -46,8 +49,14 @@ public class Minecraft2D extends GameClient {
 
     @Override
     public void stop() {
-        Logger.log(LogLevel.INFO, "Shutting down!");
+
+        if(state == GameState.TITLE_SCREEN) return;
+
+        Logger.log(LogLevel.INFO, "Saving chunks...");
         player.saveInventory();
+        overworld.saveChunks();
+        if(nether != null) nether.saveChunks();
+        Logger.log(LogLevel.INFO, "Shutting down!");
     }
 
     public static void main(String[] args) {
