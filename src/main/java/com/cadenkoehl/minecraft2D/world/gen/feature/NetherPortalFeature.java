@@ -1,6 +1,6 @@
 package com.cadenkoehl.minecraft2D.world.gen.feature;
 
-import com.cadenkoehl.minecraft2D.GameClient;
+import com.cadenkoehl.minecraft2D.client.GameClient;
 import com.cadenkoehl.minecraft2D.block.Blocks;
 import com.cadenkoehl.minecraft2D.physics.Vec2d;
 import com.cadenkoehl.minecraft2D.world.World;

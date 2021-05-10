@@ -1,7 +1,7 @@
 package com.cadenkoehl.minecraft2D.display;
 
-import com.cadenkoehl.minecraft2D.GameClient;
-import com.cadenkoehl.minecraft2D.GameState;
+import com.cadenkoehl.minecraft2D.client.GameClient;
+import com.cadenkoehl.minecraft2D.client.GameState;
 import com.cadenkoehl.minecraft2D.physics.Vec2d;
 
 import java.awt.*;

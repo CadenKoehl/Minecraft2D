@@ -1,6 +1,6 @@
 package com.cadenkoehl.minecraft2D.display;
 
-import com.cadenkoehl.minecraft2D.GameClient;
+import com.cadenkoehl.minecraft2D.client.GameClient;
 import com.cadenkoehl.minecraft2D.entities.player.PlayerEntity;
 import com.cadenkoehl.minecraft2D.item.Item;
 import com.cadenkoehl.minecraft2D.item.ItemStack;

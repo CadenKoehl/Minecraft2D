@@ -36,7 +36,7 @@ public class Item {
         return texture;
     }
 
-    public ClickResult onClick(PlayerEntity player, Vec2d clickPos) {
+    public ClickResult onClick(PlayerEntity player, ItemStack stack, Vec2d clickPos) {
         return ClickResult.FAILED;
     }
 

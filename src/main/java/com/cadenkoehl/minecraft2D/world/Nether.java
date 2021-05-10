@@ -8,8 +8,9 @@ import java.awt.*;
 
 public class Nether extends World {
 
-    public Nether(long seed) {
-        super(seed);
+
+    public Nether(Realm realm) {
+        super(realm);
     }
 
     @Override

@@ -12,7 +12,7 @@ public class FlintAndSteelItem extends Item {
     }
 
     @Override
-    public ClickResult onClick(PlayerEntity player, Vec2d pos) {
+    public ClickResult onClick(PlayerEntity player, ItemStack stack, Vec2d pos) {
 
         boolean success = false;
 

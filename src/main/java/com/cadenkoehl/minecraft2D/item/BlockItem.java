@@ -16,7 +16,7 @@ public class BlockItem extends Item {
     }
 
     @Override
-    public ClickResult onClick(PlayerEntity player, Vec2d clickPos) {
+    public ClickResult onClick(PlayerEntity player, ItemStack stack, Vec2d clickPos) {
         if(player.placeBlock(new BlockState(block, clickPos, player.getWorld()))) {
             return ClickResult.SHOULD_DECREMENT;
         }

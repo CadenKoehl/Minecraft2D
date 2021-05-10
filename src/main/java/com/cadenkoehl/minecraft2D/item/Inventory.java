@@ -1,6 +1,6 @@
 package com.cadenkoehl.minecraft2D.item;
 
-import com.cadenkoehl.minecraft2D.entities.mob.LivingEntity;
+import com.cadenkoehl.minecraft2D.entities.Entity;
 import com.cadenkoehl.minecraft2D.item.crafting.Recipe;
 import org.jetbrains.annotations.NotNull;
 
@@ -12,12 +12,12 @@ public class Inventory implements Iterable<ItemStack> {
 
     public static final int MAX_SIZE = 10;
 
-    private final LivingEntity entity;
+    private final Entity entity;
     private final List<ItemStack> items;
     private ItemStack selectedItem;
     private int slot;
 
-    public Inventory(LivingEntity entity) {
+    public Inventory(Entity entity) {
         this.entity = entity;
         this.items = new ArrayList<>();
     }
@@ -105,7 +105,7 @@ public class Inventory implements Iterable<ItemStack> {
         return items.size();
     }
 
-    public LivingEntity getEntity() {
+    public Entity getEntity() {
         return entity;
     }
 

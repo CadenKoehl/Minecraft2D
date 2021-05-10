@@ -1,12 +1,12 @@
 package com.cadenkoehl.minecraft2D.world;
 
-import com.cadenkoehl.minecraft2D.GameClient;
+import com.cadenkoehl.minecraft2D.client.GameClient;
 import com.cadenkoehl.minecraft2D.block.Block;
 import com.cadenkoehl.minecraft2D.block.BlockState;
 import com.cadenkoehl.minecraft2D.block.Blocks;
 import com.cadenkoehl.minecraft2D.display.GameFrame;
 import com.cadenkoehl.minecraft2D.entities.Tile;
-import com.cadenkoehl.minecraft2D.entities.mob.LivingEntity;
+import com.cadenkoehl.minecraft2D.entities.Entity;
 import com.cadenkoehl.minecraft2D.entities.player.PlayerEntity;
 import com.cadenkoehl.minecraft2D.physics.Vec2d;
 import com.cadenkoehl.minecraft2D.util.Util;
@@ -25,6 +25,7 @@ public abstract class World {
     public final List<Chunk> chunksPos;
     public final List<Chunk> chunksNeg;
 
+    private final Realm realm;
     private final List<Tile> entities;
     private final Sun sun;
     public final TerrainGenerator generator;
@@ -37,8 +38,9 @@ public abstract class World {
     public Color skyColor;
     private final long seed;
 
-    public World(long seed) {
-        this.seed = seed;
+    public World(Realm realm) {
+        this.realm = realm;
+        this.seed = realm.getSeed();
         this.random = new Random(seed);
         this.chunksPos = new ArrayList<>();
         this.chunksNeg = new ArrayList<>();
@@ -53,6 +55,10 @@ public abstract class World {
         skyColor = this.getSkyColor();
         updateSkyColor();
         new Thread(this::startChunkGen, "Chunk gen thread").start();
+    }
+
+    public Realm getRealm() {
+        return realm;
     }
 
     public void startChunkGen() {
@@ -74,9 +80,9 @@ public abstract class World {
                 chunkTag.put(block.pos.x + ":" + block.pos.y, block.getTag());
             }
             try {
-                File dir = new File("data/" + this.getName() + "/chunks/");
+                File dir = new File("saves/" + this.getRealm().getName() + "/" + this.getName() + "/chunks/");
                 dir.mkdirs();
-                NBTUtil.write(new NamedTag("Data", chunkTag), "data/" + this.getName() + "/chunks/chunk_" + i + ".dat");
+                NBTUtil.write(new NamedTag("Data", chunkTag), new File(dir, "chunk_" + i + ".dat"));
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -103,8 +109,8 @@ public abstract class World {
             chunk.tick();
         }
         for(Tile entity : new ArrayList<>(entities)) {
-            if(entity instanceof LivingEntity) {
-                if(!((LivingEntity) entity).isAlive()) entities.remove(entity);
+            if(entity instanceof Entity) {
+                if(!((Entity) entity).isAlive()) entities.remove(entity);
             }
             entity.tick();
         }

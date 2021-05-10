@@ -1,13 +1,12 @@
 package com.cadenkoehl.minecraft2D.entities.player;
 
 import com.cadenkoehl.minecraft2D.block.BlockState;
-import com.cadenkoehl.minecraft2D.entities.mob.LivingEntity;
+import com.cadenkoehl.minecraft2D.entities.Entity;
 import com.cadenkoehl.minecraft2D.item.*;
 import com.cadenkoehl.minecraft2D.physics.Vec2d;
 import com.cadenkoehl.minecraft2D.render.Texture;
 import com.cadenkoehl.minecraft2D.world.World;
 import net.querz.nbt.io.NBTUtil;
-import net.querz.nbt.io.NamedTag;
 import net.querz.nbt.tag.CompoundTag;
 import net.querz.nbt.tag.ListTag;
 import net.querz.nbt.tag.StringTag;
@@ -16,7 +15,7 @@ import net.querz.nbt.tag.Tag;
 import java.io.File;
 import java.io.IOException;
 
-public class PlayerEntity extends LivingEntity {
+public class PlayerEntity extends Entity {
 
     public final Vec2d originalPos;
     private final Inventory inventory;
@@ -37,7 +36,7 @@ public class PlayerEntity extends LivingEntity {
         ItemStack item = inventory.getSelectedItem();
         if(item == null) return;
 
-        Item.ClickResult result = item.getItem().onClick(this, clickPos);
+        Item.ClickResult result = item.getItem().onClick(this, item, clickPos);
         if(result == Item.ClickResult.SHOULD_DECREMENT) item.decrement();
     }
 
@@ -69,7 +68,7 @@ public class PlayerEntity extends LivingEntity {
 
     public void loadInventory() {
 
-        File file = new File("data/inventory.dat");
+        File file = new File("saves/" + this.getWorld().getRealm().getName() + "/inventory.dat");
         if(!file.exists()) return;
 
         Tag<?> invTag;
@@ -106,7 +105,7 @@ public class PlayerEntity extends LivingEntity {
         tag.put("Items", items);
 
         try {
-            NBTUtil.write(tag, "data/inventory.dat");
+            NBTUtil.write(tag, "saves/" + getWorld().getRealm().getName() + "/inventory.dat");
         } catch (IOException e) {
             e.printStackTrace();
         }

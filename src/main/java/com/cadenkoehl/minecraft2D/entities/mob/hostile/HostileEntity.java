@@ -1,12 +1,12 @@
 package com.cadenkoehl.minecraft2D.entities.mob.hostile;
 
-import com.cadenkoehl.minecraft2D.GameClient;
-import com.cadenkoehl.minecraft2D.entities.mob.LivingEntity;
+import com.cadenkoehl.minecraft2D.client.GameClient;
+import com.cadenkoehl.minecraft2D.entities.Entity;
 import com.cadenkoehl.minecraft2D.entities.player.PlayerEntity;
 import com.cadenkoehl.minecraft2D.physics.Vec2d;
 import com.cadenkoehl.minecraft2D.world.World;
 
-public abstract class HostileEntity extends LivingEntity {
+public abstract class HostileEntity extends Entity {
 
     public HostileEntity(Vec2d pos, World world, String displayName) {
         super(pos, world, displayName);

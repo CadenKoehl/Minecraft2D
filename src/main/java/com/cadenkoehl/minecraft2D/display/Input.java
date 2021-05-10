@@ -1,10 +1,10 @@
 package com.cadenkoehl.minecraft2D.display;
 
-import com.cadenkoehl.minecraft2D.GameClient;
-import com.cadenkoehl.minecraft2D.GameState;
+import com.cadenkoehl.minecraft2D.client.GameClient;
+import com.cadenkoehl.minecraft2D.client.GameState;
 import com.cadenkoehl.minecraft2D.block.BlockState;
 import com.cadenkoehl.minecraft2D.entities.Tile;
-import com.cadenkoehl.minecraft2D.entities.mob.LivingEntity;
+import com.cadenkoehl.minecraft2D.entities.Entity;
 import com.cadenkoehl.minecraft2D.item.Item;
 import com.cadenkoehl.minecraft2D.item.ItemStack;
 import com.cadenkoehl.minecraft2D.item.crafting.Recipe;
@@ -17,11 +17,20 @@ import java.awt.event.MouseEvent;
 import java.util.Map;
 
 public class Input {
+
     private final GameClient game;
     private static boolean mousePressed;
 
     public Input(GameClient game) {
         this.game = game;
+    }
+
+    public static void hideCursor() {
+        GameClient.getInstance().getFrame().getContentPane().setCursor(GameFrame.BLANK_CURSOR);
+    }
+
+    public static void showCursor() {
+        GameClient.getInstance().getFrame().getContentPane().setCursor(Cursor.getDefaultCursor());
     }
 
     public void onKeyPressed(KeyEvent event) {
@@ -39,7 +48,7 @@ public class Input {
         }
 
         if(isNumberKey) {
-            game.player.getInventory().setSelectedItemSlot(numberKey - 1);
+            GameClient.getPlayer().getInventory().setSelectedItemSlot(numberKey - 1);
             return;
         }
 
@@ -117,8 +126,8 @@ public class Input {
                         entity = game.currentWorld.getEntity(new Vec2d(pos.x - 1, pos.y));
                     }
 
-                    if (entity instanceof LivingEntity) {
-                        game.player.tryAttack((LivingEntity) entity);
+                    if (entity instanceof Entity) {
+                        game.player.tryAttack((Entity) entity);
                         return;
                     }
                     game.player.breakBlock(pos);

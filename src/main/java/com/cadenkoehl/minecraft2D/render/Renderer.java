@@ -2,7 +2,7 @@ package com.cadenkoehl.minecraft2D.render;
 
 import com.cadenkoehl.minecraft2D.display.GameWindow;
 import com.cadenkoehl.minecraft2D.entities.Tile;
-import com.cadenkoehl.minecraft2D.entities.mob.LivingEntity;
+import com.cadenkoehl.minecraft2D.entities.Entity;
 import com.cadenkoehl.minecraft2D.entities.player.PlayerEntity;
 
 import javax.swing.*;
@@ -28,8 +28,8 @@ public class Renderer {
             icon.paintIcon(GameWindow.INSTANCE, GRAPHICS, x - CAMERA.offset.x, y - CAMERA.offset.y);
         }
 
-        if (tile instanceof LivingEntity && !(tile instanceof PlayerEntity)) {
-            GRAPHICS.drawString("HP: " + ((LivingEntity) tile).health, x - CAMERA.offset.x, (y - CAMERA.offset.y) - 16);
+        if (tile instanceof Entity && !(tile instanceof PlayerEntity)) {
+            GRAPHICS.drawString("HP: " + ((Entity) tile).health, x - CAMERA.offset.x, (y - CAMERA.offset.y) - 16);
         }
     }
 

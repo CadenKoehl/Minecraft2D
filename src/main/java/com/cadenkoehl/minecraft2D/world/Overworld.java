@@ -11,8 +11,9 @@ import java.util.List;
 
 public class Overworld extends World {
 
-    public Overworld(long seed) {
-        super(seed);
+
+    public Overworld(Realm realm) {
+        super(realm);
     }
 
     @Override

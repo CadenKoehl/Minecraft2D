@@ -7,6 +7,7 @@ import com.cadenkoehl.minecraft2D.display.GameFrame;
 import com.cadenkoehl.minecraft2D.entities.Tile;
 import com.cadenkoehl.minecraft2D.physics.Vec2d;
 import com.cadenkoehl.minecraft2D.world.Chunk;
+import com.cadenkoehl.minecraft2D.world.Realm;
 import com.cadenkoehl.minecraft2D.world.World;
 import com.cadenkoehl.minecraft2D.world.biome.Biome;
 import com.cadenkoehl.minecraft2D.world.gen.feature.ConfiguredFeature;
@@ -29,6 +30,7 @@ public abstract class TerrainGenerator {
 
     public final int surfaceHeight = GameFrame.HEIGHT / Tile.BLOCK_SIZE - 2;
     private final World world = this.getWorld();
+    private final Realm realm = world.getRealm();
     private int chunks;
     private Biome biome;
     private int chunksInCurrentBiome;
@@ -49,7 +51,7 @@ public abstract class TerrainGenerator {
     public void genChunk(int chunkX) {
         world.addChunk(new Chunk());
 
-        File file = new File("data/" + world.getName() + "/chunks/chunk_" + chunkX + ".dat");
+        File file = new File("saves/" + realm.getName() + "/" + world.getName() + "/chunks/chunk_" + chunkX + ".dat");
 
         chunkX = chunkX * 16;
         world.width = world.width + 16;

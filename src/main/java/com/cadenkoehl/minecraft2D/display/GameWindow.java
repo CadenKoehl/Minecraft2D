@@ -1,6 +1,6 @@
 package com.cadenkoehl.minecraft2D.display;
 
-import com.cadenkoehl.minecraft2D.GameClient;
+import com.cadenkoehl.minecraft2D.client.GameClient;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
