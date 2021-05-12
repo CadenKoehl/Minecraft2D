@@ -12,6 +12,7 @@ public class Camera {
     }
 
     public void centerOn(PlayerEntity player) {
+
         if(this.offset.x == player.screenPos.x && this.offset.y == player.screenPos.y) return;
 
         this.offset.x = player.screenPos.x - 470;

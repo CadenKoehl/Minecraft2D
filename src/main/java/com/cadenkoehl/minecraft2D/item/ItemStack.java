@@ -17,6 +17,10 @@ public class ItemStack {
         setCount(count);
     }
 
+    public ItemStack(CompoundTag tag) {
+        this(Items.valueOf(tag.getString("Item")), tag.getInt("Count"));
+    }
+
     public void setCount(int count) {
 
         if(count > item.getMaxStackSize()) return;
@@ -29,7 +33,7 @@ public class ItemStack {
         this.count = count;
     }
 
-    public CompoundTag createCompoundTag() {
+    public CompoundTag getCompoundTag() {
         CompoundTag tag = new CompoundTag();
         tag.putString("Item", item.getName());
         tag.putInt("Count", this.count);

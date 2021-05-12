@@ -1,5 +1,8 @@
 package com.cadenkoehl.minecraft2D.world;
 
+import com.cadenkoehl.minecraft2D.client.GameClient;
+import com.cadenkoehl.minecraft2D.entities.Entity;
+import com.cadenkoehl.minecraft2D.entities.EntityType;
 import com.cadenkoehl.minecraft2D.entities.player.PlayerEntity;
 import com.cadenkoehl.minecraft2D.physics.Vec2d;
 
@@ -27,14 +30,17 @@ public class Realm {
         this.overworld = new Overworld(this);
         this.currentWorld = this.overworld;
 
-        this.player = new PlayerEntity("Player", new Vec2d(17, 4), currentWorld);
-        this.overworld.spawnEntity(player);
+        this.player = currentWorld.spawnEntity(EntityType.PLAYER, new Vec2d(17, 7));
+    }
+
+    public Save getSave() {
+        return save;
     }
 
     public void save() {
         overworld.saveChunks();
         nether.saveChunks();
-        player.saveInventory();
+        player.saveData();
     }
 
     public String getName() {
@@ -75,6 +81,14 @@ public class Realm {
             this.file = new File("saves", name);
 
             file.mkdirs();
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public File getFile() {
+            return file;
         }
     }
 }

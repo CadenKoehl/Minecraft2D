@@ -2,6 +2,8 @@ package com.cadenkoehl.minecraft2D.item;
 
 import com.cadenkoehl.minecraft2D.entities.Entity;
 import com.cadenkoehl.minecraft2D.item.crafting.Recipe;
+import net.querz.nbt.tag.CompoundTag;
+import net.querz.nbt.tag.ListTag;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -20,6 +22,15 @@ public class Inventory implements Iterable<ItemStack> {
     public Inventory(Entity entity) {
         this.entity = entity;
         this.items = new ArrayList<>();
+    }
+
+    public ListTag<CompoundTag> getTag() {
+        ListTag<CompoundTag> tag = new ListTag<>(CompoundTag.class);
+
+        for(ItemStack item : this) {
+            tag.add(item.getCompoundTag());
+        }
+        return tag;
     }
 
     public void addItem(ItemStack stack) {

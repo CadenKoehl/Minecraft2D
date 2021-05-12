@@ -1,12 +1,14 @@
 package com.cadenkoehl.minecraft2D.entities.player;
 
 import com.cadenkoehl.minecraft2D.block.BlockState;
+import com.cadenkoehl.minecraft2D.client.GameClient;
 import com.cadenkoehl.minecraft2D.entities.Entity;
 import com.cadenkoehl.minecraft2D.item.*;
 import com.cadenkoehl.minecraft2D.physics.Vec2d;
 import com.cadenkoehl.minecraft2D.render.Texture;
 import com.cadenkoehl.minecraft2D.world.World;
 import net.querz.nbt.io.NBTUtil;
+import net.querz.nbt.io.NamedTag;
 import net.querz.nbt.tag.CompoundTag;
 import net.querz.nbt.tag.ListTag;
 import net.querz.nbt.tag.StringTag;
@@ -17,18 +19,21 @@ import java.io.IOException;
 
 public class PlayerEntity extends Entity {
 
-    public final Vec2d originalPos;
     private final Inventory inventory;
     public boolean isInventoryOpen;
     public BlockState breakingBlock;
     public Texture skin;
 
-    public PlayerEntity(String username, Vec2d vec2d, World world) {
-        super(vec2d, world, username);
-        this.originalPos = vec2d;
+    public PlayerEntity() {
+        super("Player");
         this.inventory = new Inventory(this);
         this.skin = new Texture("textures/skin.png");
-        this.loadInventory();
+        this.setUuid(GameClient.getUUID());
+    }
+
+    @Override
+    public void postSpawn() {
+        this.loadData();
     }
 
     public void clickItem(Vec2d clickPos) {
@@ -38,6 +43,13 @@ public class PlayerEntity extends Entity {
 
         Item.ClickResult result = item.getItem().onClick(this, item, clickPos);
         if(result == Item.ClickResult.SHOULD_DECREMENT) item.decrement();
+    }
+
+    @Override
+    public CompoundTag getCompoundTag() {
+        CompoundTag tag = super.getCompoundTag();
+        tag.put("Inventory", this.getInventory().getTag());
+        return tag;
     }
 
     public Inventory getInventory() {
@@ -66,46 +78,35 @@ public class PlayerEntity extends Entity {
         }
     }
 
-    public void loadInventory() {
-
-        File file = new File("saves/" + this.getWorld().getRealm().getName() + "/inventory.dat");
+    public void loadData() {
+        File file = new File(this.getWorld().getRealm().getSave().getFile(), "playerdata/" + this.getUuid().toString() + ".dat");
         if(!file.exists()) return;
 
-        Tag<?> invTag;
+        NamedTag playerData;
 
         try {
-            invTag = NBTUtil.read(file).getTag();
+            playerData = NBTUtil.read(file);
         } catch (IOException e) {
             e.printStackTrace();
             return;
         }
 
-        if(invTag instanceof CompoundTag) {
-            CompoundTag tag = (CompoundTag) invTag;
-            for(StringTag stringTag : (ListTag<StringTag>) tag.get("Items")) {
+        CompoundTag playerTag = (CompoundTag) playerData.getTag();
 
-                String[] splitTag = stringTag.getValue().split(":");
+        this.setScreenPos(Vec2d.toScreenPos(new Vec2d(playerTag.getInt("X"), playerTag.getInt("Y"))));
+        this.setHealth(playerTag.getInt("Health"));
 
-                inventory.addItem(new ItemStack(Items.valueOf(splitTag[0]), Integer.parseInt(splitTag[1])));
-            }
-        }
+        ListTag<CompoundTag> inventoryTag = (ListTag<CompoundTag>) playerTag.get("Inventory");
+        inventoryTag.forEach(item -> inventory.addItem(new ItemStack(item)));
     }
 
-    public void saveInventory() {
+    public void saveData() {
 
-        CompoundTag tag = new CompoundTag();
-        ListTag<StringTag> items = new ListTag<>(StringTag.class);
-
-        for(ItemStack stack : inventory) {
-            StringTag name = new StringTag();
-            name.setValue(stack.getItem().getName() + ":" + stack.getCount());
-            items.add(name);
-        }
-
-        tag.put("Items", items);
+        File dir = new File(this.getWorld().getRealm().getSave().getFile(), "playerdata/");
+        dir.mkdirs();
 
         try {
-            NBTUtil.write(tag, "saves/" + getWorld().getRealm().getName() + "/inventory.dat");
+            NBTUtil.write(this.getCompoundTag(), new File(dir, this.getUuid().toString() + ".dat"));
         } catch (IOException e) {
             e.printStackTrace();
         }

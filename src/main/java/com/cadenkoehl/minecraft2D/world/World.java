@@ -5,6 +5,7 @@ import com.cadenkoehl.minecraft2D.block.Block;
 import com.cadenkoehl.minecraft2D.block.BlockState;
 import com.cadenkoehl.minecraft2D.block.Blocks;
 import com.cadenkoehl.minecraft2D.display.GameFrame;
+import com.cadenkoehl.minecraft2D.entities.EntityType;
 import com.cadenkoehl.minecraft2D.entities.Tile;
 import com.cadenkoehl.minecraft2D.entities.Entity;
 import com.cadenkoehl.minecraft2D.entities.player.PlayerEntity;
@@ -14,6 +15,7 @@ import com.cadenkoehl.minecraft2D.world.gen.TerrainGenerator;
 import net.querz.nbt.io.NBTUtil;
 import net.querz.nbt.io.NamedTag;
 import net.querz.nbt.tag.CompoundTag;
+import net.querz.nbt.tag.ListTag;
 
 import java.awt.*;
 import java.io.File;
@@ -26,7 +28,7 @@ public abstract class World {
     public final List<Chunk> chunksNeg;
 
     private final Realm realm;
-    private final List<Tile> entities;
+    private final List<Entity> entities;
     private final Sun sun;
     public final TerrainGenerator generator;
     public int width;
@@ -73,15 +75,25 @@ public abstract class World {
     }
 
     public void saveChunks() {
+
+        File dir = new File("saves/" + this.getRealm().getName() + "/" + this.getName() + "/chunks/");
+        dir.mkdirs();
+
         for (int i = 0, chunksSize = chunksPos.size(); i < chunksSize; i++) {
             Chunk chunk = chunksPos.get(i);
             CompoundTag chunkTag = new CompoundTag();
             for (BlockState block : chunk.getBlocks()) {
                 chunkTag.put(block.pos.x + ":" + block.pos.y, block.getTag());
             }
+            ListTag<CompoundTag> entityTag = new ListTag<>(CompoundTag.class);
+            for(Entity entity : entities) {
+                if(entity.getName().equals("player")) continue;
+                if(entity.getChunkX() == i) {
+                    entityTag.add(entity.getCompoundTag());
+                }
+            }
+            chunkTag.put("Entities", entityTag);
             try {
-                File dir = new File("saves/" + this.getRealm().getName() + "/" + this.getName() + "/chunks/");
-                dir.mkdirs();
                 NBTUtil.write(new NamedTag("Data", chunkTag), new File(dir, "chunk_" + i + ".dat"));
             } catch (Exception e) {
                 e.printStackTrace();
@@ -139,10 +151,18 @@ public abstract class World {
         return !isNight() && this.hasDaylightCycle();
     }
 
-    public void spawnEntity(Tile entity) {
+    public void spawnEntity(Entity entity) {
         entities.add(entity);
         entity.render();
         entity.updateGraphics();
+    }
+
+    public <E extends Entity> E spawnEntity(EntityType<E> entityType, Vec2d pos) {
+        Entity entity = entityType.createEntity();
+        entity.setPos(pos);
+        entity.setWorld(this);
+        entity.postSpawn();
+        return (E) entity;
     }
 
     public void removeEntity(Tile entity) {
@@ -156,7 +176,7 @@ public abstract class World {
         return null;
     }
 
-    public List<Tile> getEntities() {
+    public List<Entity> getEntities() {
         return entities;
     }
 

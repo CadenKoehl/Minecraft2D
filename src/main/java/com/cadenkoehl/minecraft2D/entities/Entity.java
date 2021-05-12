@@ -1,17 +1,31 @@
 package com.cadenkoehl.minecraft2D.entities;
 
+import com.cadenkoehl.minecraft2D.block.Blocks;
 import com.cadenkoehl.minecraft2D.client.GameClient;
 import com.cadenkoehl.minecraft2D.block.BlockState;
 import com.cadenkoehl.minecraft2D.physics.Vec2d;
 import com.cadenkoehl.minecraft2D.util.Util;
 import com.cadenkoehl.minecraft2D.world.Overworld;
 import com.cadenkoehl.minecraft2D.world.World;
+import net.querz.nbt.tag.CompoundTag;
 
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.UUID;
 
 
 public abstract class Entity extends Tile {
+
+    public static Entity loadFromTag(CompoundTag tag) {
+        EntityType<? extends Entity> entityType = EntityType.valueOf(tag.getString("Name"));
+
+        Entity entity = entityType.createEntity();
+        entity.setHealth(tag.getInt("Health"));
+        entity.setPos(new Vec2d(tag.getInt("X"), tag.getInt("Y")));
+        entity.setUuid(UUID.fromString(tag.getString("UUID")));
+
+        return entity;
+    }
 
     public int health = this.getMaxHealth();
     private boolean affectedByGravity;
@@ -21,13 +35,17 @@ public abstract class Entity extends Tile {
     public int portalTicks;
     public BlockState blockOnHead;
     public BlockState blockOnFeet;
+    private final EntityType<? extends Entity> type;
+    private UUID uuid;
 
-    public Entity(Vec2d pos, World world, String displayName) {
-        super(pos, world, "entities", displayName);
+    public Entity(String displayName) {
+        super(null, null, "entities", displayName);
         affectedByGravity = true;
         alive = true;
         damageCooldown = this.getMaxDamageCooldown();
         healCooldown = 10000;
+        this.type = EntityType.valueOf(this.getName());
+        uuid = UUID.randomUUID();
     }
 
     @Override
@@ -47,11 +65,11 @@ public abstract class Entity extends Tile {
 
         if(portalTicks > 500) {
             portalTicks = 0;
-            if(this.getWorld() instanceof Overworld) setWorld(GameClient.getNether());
-            else setWorld(GameClient.getOverworld());
+            if(this.getWorld() instanceof Overworld) changeWorld(GameClient.getNether());
+            else changeWorld(GameClient.getOverworld());
         }
 
-        if(this.affectedByGravity) {
+        if(this.affectedByGravity && this.getChunkX() < this.getWorld().chunksPos.size()) {
             setVelocityY(1);
         }
         if(healCooldown < 0) {
@@ -66,6 +84,46 @@ public abstract class Entity extends Tile {
             portalTicks++;
         }
         else portalTicks = 0;
+    }
+
+    public void postSpawn() {}
+
+    public UUID getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(UUID uuid) {
+        this.uuid = uuid;
+    }
+
+    public <E extends Entity> EntityType<E> getEntityType() {
+        return (EntityType<E>) type;
+    }
+
+    public CompoundTag getCompoundTag() {
+        CompoundTag tag = new CompoundTag();
+        tag.putString("Name", this.getName());
+        tag.putString("UUID", uuid.toString());
+        tag.putInt("Health", health);
+        tag.putInt("X", pos.x);
+        tag.putInt("Y", pos.y);
+        return tag;
+    }
+
+    @Override
+    public void setWorld(World world) {
+        super.setWorld(world);
+        this.getWorld().spawnEntity(this);
+    }
+
+    public void changeWorld(World newWorld) {
+        this.getWorld().removeEntity(this);
+        setWorld(newWorld);
+        for(BlockState state : this.getChunk().getBlocks()) {
+            if(state.getBlock() == Blocks.NETHER_PORTAL) {
+                state.setVisible(true);
+            }
+        }
     }
 
     public boolean heal() {
@@ -184,6 +242,14 @@ public abstract class Entity extends Tile {
         }
     }
 
+    public boolean isAffectedByGravity() {
+        return affectedByGravity;
+    }
+
+    public void setAffectedByGravity(boolean affectedByGravity) {
+        this.affectedByGravity = affectedByGravity;
+    }
+
     public boolean tryAttack(Entity target) {
 
         if(target == this) return false;
@@ -205,6 +271,10 @@ public abstract class Entity extends Tile {
             }
         }
         return false;
+    }
+
+    public void setHealth(int health) {
+        this.health = health;
     }
 
     public boolean damage(int amount) {
@@ -232,11 +302,6 @@ public abstract class Entity extends Tile {
 
     public int getReach() {
         return 6;
-    }
-
-    @Override
-    public boolean isAffectedByGravity() {
-        return true;
     }
 
     public int getMaxDamageCooldown() {

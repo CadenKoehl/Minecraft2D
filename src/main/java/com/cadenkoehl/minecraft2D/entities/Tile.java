@@ -133,7 +133,10 @@ public abstract class Tile {
     }
 
     public void setPos(Vec2d pos) {
+        boolean shouldUpdateScreenPos = this.pos == null;
         this.pos = pos;
+
+        if(shouldUpdateScreenPos) screenPos = Vec2d.toScreenPos(this.pos);
     }
 
     public void setScreenPos(Vec2d screenPos) {
@@ -156,23 +159,16 @@ public abstract class Tile {
         screenPos = Vec2d.toScreenPos(pos);
     }
 
-    public boolean isAffectedByGravity() {
-        return false;
-    }
-
     public void setWorld(World world) {
-        this.world.removeEntity(this);
         this.world = world;
-        this.world.spawnEntity(this);
-        for(BlockState state : this.getChunk().getBlocks()) {
-            if(state.getBlock() == Blocks.NETHER_PORTAL) {
-                state.setVisible(true);
-            }
-        }
     }
 
     public Chunk getChunk() {
         return world.getChunk(pos.x);
+    }
+
+    public int getChunkX() {
+        return pos.x / 16;
     }
 
     public int getHeight() {

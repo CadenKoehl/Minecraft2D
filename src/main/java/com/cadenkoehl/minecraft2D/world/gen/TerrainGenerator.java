@@ -4,6 +4,7 @@ import com.cadenkoehl.minecraft2D.block.Block;
 import com.cadenkoehl.minecraft2D.block.BlockState;
 import com.cadenkoehl.minecraft2D.block.Blocks;
 import com.cadenkoehl.minecraft2D.display.GameFrame;
+import com.cadenkoehl.minecraft2D.entities.Entity;
 import com.cadenkoehl.minecraft2D.entities.Tile;
 import com.cadenkoehl.minecraft2D.physics.Vec2d;
 import com.cadenkoehl.minecraft2D.world.Chunk;
@@ -13,6 +14,7 @@ import com.cadenkoehl.minecraft2D.world.biome.Biome;
 import com.cadenkoehl.minecraft2D.world.gen.feature.ConfiguredFeature;
 import net.querz.nbt.io.NBTUtil;
 import net.querz.nbt.tag.CompoundTag;
+import net.querz.nbt.tag.ListTag;
 
 import java.io.File;
 import java.io.IOException;
@@ -68,6 +70,14 @@ public abstract class TerrainGenerator {
             }
 
             tag.forEach(entry -> {
+                if(entry.getKey().equals("Entities")) {
+                    ListTag<CompoundTag> entities = new ListTag<>(CompoundTag.class);
+                    entities.forEach(entityTag -> {
+                        Entity entity = Entity.loadFromTag(entityTag);
+                        world.spawnEntity(entity);
+                    });
+                    return;
+                }
                 String[] pos = entry.getKey().split(":");
                 world.setBlock(new BlockState((CompoundTag) entry.getValue(), new Vec2d(Integer.parseInt(pos[0]), Integer.parseInt(pos[1])), world));
             });

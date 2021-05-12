@@ -44,6 +44,8 @@ public class Minecraft2D extends GameClient {
     @Override
     public void stop() {
 
+        this.saveConfig();
+
         if(state == GameState.TITLE_SCREEN) return;
 
         Logger.log(LogLevel.INFO, "Saving chunks...");

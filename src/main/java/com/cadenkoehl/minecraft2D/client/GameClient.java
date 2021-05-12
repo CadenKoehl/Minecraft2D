@@ -2,16 +2,22 @@ package com.cadenkoehl.minecraft2D.client;
 
 import com.cadenkoehl.minecraft2D.display.*;
 import com.cadenkoehl.minecraft2D.entities.player.PlayerEntity;
+import com.cadenkoehl.minecraft2D.item.Items;
 import com.cadenkoehl.minecraft2D.physics.Vec2d;
 import com.cadenkoehl.minecraft2D.world.Nether;
 import com.cadenkoehl.minecraft2D.world.Overworld;
 import com.cadenkoehl.minecraft2D.world.Realm;
 import com.cadenkoehl.minecraft2D.world.World;
+import net.querz.nbt.io.NBTUtil;
+import net.querz.nbt.tag.CompoundTag;
 
 import java.awt.*;
+import java.io.File;
+import java.io.IOException;
 import java.util.ConcurrentModificationException;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.UUID;
 
 public abstract class GameClient {
 
@@ -20,6 +26,7 @@ public abstract class GameClient {
     private final GameFrame frame;
     private final GameWindow window;
 
+    private final UUID uuid;
     public Realm realm;
     public World currentWorld;
     public Overworld overworld;
@@ -38,6 +45,27 @@ public abstract class GameClient {
 
         INSTANCE = this;
 
+        File dir = new File("client");
+        dir.mkdirs();
+
+        File file = new File(dir, "client.dat");
+
+        if(file.exists()) {
+
+            CompoundTag clientTag;
+
+            try {
+                clientTag = (CompoundTag) NBTUtil.read(file).getTag();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
+            uuid = UUID.fromString(clientTag.getString("UUID"));
+        }
+        else {
+            uuid = UUID.randomUUID();
+        }
+
         this.frame = new GameFrame();
         this.window = new GameWindow(this, frame);
         frame.add(window);
@@ -47,11 +75,35 @@ public abstract class GameClient {
 
         this.inputManager = new Input(this);
         scheduleFPSTimer();
-        INSTANCE = this;
+    }
+
+    public void saveConfig() {
+        File dir = new File("client");
+        dir.mkdirs();
+
+        File file = new File(dir, "client.dat");
+        try {
+            file.createNewFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return;
+        }
+
+        CompoundTag clientTag = new CompoundTag();
+        clientTag.putString("UUID", player.getUuid().toString());
+        try {
+            NBTUtil.write(clientTag, file);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public static GameClient getInstance() {
         return INSTANCE;
+    }
+
+    public static UUID getUUID() {
+        return INSTANCE.uuid;
     }
 
     public static PlayerEntity getPlayer() {

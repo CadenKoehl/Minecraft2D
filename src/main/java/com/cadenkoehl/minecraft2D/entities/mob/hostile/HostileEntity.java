@@ -8,8 +8,8 @@ import com.cadenkoehl.minecraft2D.world.World;
 
 public abstract class HostileEntity extends Entity {
 
-    public HostileEntity(Vec2d pos, World world, String displayName) {
-        super(pos, world, displayName);
+    public HostileEntity(String displayName) {
+        super(displayName);
     }
 
     @Override
