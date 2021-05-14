@@ -31,6 +31,7 @@ public class Block {
     private final int breakSpeed;
     private final SoundEvent breakSound;
     private final boolean defaultCanCollide;
+    private final boolean affectedByGravity;
     private final LootTable lootTable;
 
     public Block(Settings settings) {
@@ -41,6 +42,7 @@ public class Block {
         this.breakSpeed = settings.breakSpeed;
         this.breakSound = settings.breakSound;
         this.defaultCanCollide = settings.defaultCanCollide;
+        this.affectedByGravity = settings.affectedByGravity;
         List<LootTable.Entry> entries = new ArrayList<>(settings.lootTableEntries);
         entries.add(new LootTable.Entry(blockItem, 1, 1, 1));
         this.lootTable = new LootTable(entries);
@@ -72,6 +74,10 @@ public class Block {
 
     public boolean getDefaultCanCollide() {
         return defaultCanCollide;
+    }
+
+    public boolean isAffectedByGravity() {
+        return affectedByGravity;
     }
 
     public LootTable getLootTable() {
@@ -106,6 +112,7 @@ public class Block {
         private SoundEvent breakSound;
 
         private boolean defaultCanCollide;
+        private boolean affectedByGravity;
 
         private List<LootTable.Entry> lootTableEntries;
 
@@ -130,6 +137,11 @@ public class Block {
 
         public Settings defaultCanCollide(boolean defaultCanCollide) {
             this.defaultCanCollide = defaultCanCollide;
+            return this;
+        }
+
+        public Settings affectedByGravity(boolean affectedByGravity) {
+            this.affectedByGravity = affectedByGravity;
             return this;
         }
 

@@ -30,6 +30,7 @@ public class Chunk {
     }
 
     public boolean setBlock(BlockState block) {
+        block.onPlace();
         return blocks.add(block);
     }
 

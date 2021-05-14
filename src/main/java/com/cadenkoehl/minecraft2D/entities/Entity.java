@@ -138,6 +138,7 @@ public abstract class Entity extends Tile {
         return false;
     }
 
+    @Override
     protected void updatePosX() {
 
         //Moving right
@@ -168,6 +169,7 @@ public abstract class Entity extends Tile {
         }
     }
 
+    @Override
     protected void updatePosY() {
         //Moving down
         if(velocity.y > 0) {
@@ -202,17 +204,6 @@ public abstract class Entity extends Tile {
         }
 
         return block.canCollide();
-    }
-
-    public boolean hasCollidedWith(Tile entity) {
-
-        int playerWidth = this.getWidth();
-        int playerHeight = this.getHeight();
-
-        return this.screenPos.x < entity.screenPos.x + entity.getWidth() &&
-                this.screenPos.x + playerWidth > entity.screenPos.x &&
-                this.screenPos.y < entity.screenPos.y + entity.getHeight() &&
-                this.screenPos.y + playerHeight > entity.screenPos.y;
     }
 
     public void moveRight(int amount) {

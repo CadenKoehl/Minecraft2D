@@ -59,8 +59,12 @@ public abstract class Tile {
         updatePosY();
     }
 
-    protected void updatePosX(){
+    protected void updatePosX() {
         setScreenPosX(screenPos.x + velocity.x);
+    }
+
+    protected void updatePosY() {
+        setScreenPosY(screenPos.y + velocity.y);
     }
 
     public boolean inFrame() {
@@ -68,10 +72,6 @@ public abstract class Tile {
                 this.screenPos.y - Renderer.CAMERA.offset.y < 570 &&
                 this.screenPos.x - Renderer.CAMERA.offset.x > -50 &&
                 this.screenPos.x - Renderer.CAMERA.offset.x < GameFrame.WIDTH;
-    }
-
-    protected void updatePosY() {
-        setScreenPosY(screenPos.y + velocity.y);
     }
 
     protected void syncPos() {
@@ -88,6 +88,17 @@ public abstract class Tile {
         int x = this.pos.x - pos.x;
         int y = this.pos.y - pos.y;
         return Math.abs(x + y);
+    }
+
+    public boolean hasCollidedWith(Tile entity) {
+
+        int playerWidth = this.getWidth();
+        int playerHeight = this.getHeight();
+
+        return this.screenPos.x < entity.screenPos.x + entity.getWidth() &&
+                this.screenPos.x + playerWidth > entity.screenPos.x &&
+                this.screenPos.y < entity.screenPos.y + entity.getHeight() &&
+                this.screenPos.y + playerHeight > entity.screenPos.y;
     }
 
     public int distanceFrom(Tile tile) {

@@ -24,6 +24,7 @@ public class BlockState extends Tile {
     private boolean mined;
     private final Item blockItem;
     private final Texture texture;
+    private boolean falling;
 
     public BlockState(Block block, Vec2d pos, World world) {
         this(block, pos, world, true, (block != Blocks.NETHER_PORTAL));
@@ -57,7 +58,31 @@ public class BlockState extends Tile {
                 miner.breakBlock(this.pos);
             }
         }
+        if(this.falling) {
+            if(!this.canFall()) {
+                setFalling(false);
+            }
+            else {
+                setScreenPosY(screenPos.y + 1);
+            }
+        }
         super.tick();
+    }
+
+    public void onPlace() {
+        if(this.canFall()) {
+            this.setFalling(true);
+        }
+    }
+
+    private boolean canFall() {
+
+        if(!block.isAffectedByGravity()) return false;
+
+        BlockState blockUnder = this.getWorld().getBlock(pos.x, pos.y + 1);
+        if(blockUnder == null) return true;
+
+        return this.hasCollidedWith(blockUnder);
     }
 
     @Override
@@ -104,6 +129,11 @@ public class BlockState extends Tile {
 
     public boolean hasBeenMined() {
         return mined;
+    }
+
+    public void setFalling(boolean falling) {
+        if(!block.isAffectedByGravity()) throw new IllegalStateException(block.getName() + " cannot be falling because it is not affected by gravity!");
+        this.falling = falling;
     }
 
     public void mine() {
