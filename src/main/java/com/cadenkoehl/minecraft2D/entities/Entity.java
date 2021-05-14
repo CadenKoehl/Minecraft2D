@@ -293,7 +293,7 @@ public abstract class Entity extends Tile {
     }
 
     public boolean isOnGround() {
-        return this.getWorld().getBlock(this.pos.x, this.pos.y + 2) != null;
+        return this.getWorld().getBlock(this.pos.x, this.pos.y + 2) != null || this.getWorld().getBlock(this.pos.x + 1, this.pos.y + 2) != null;
     }
 
     public boolean isAlive() {

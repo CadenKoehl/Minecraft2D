@@ -35,15 +35,23 @@ public class Inventory implements Iterable<ItemStack> {
 
     public void addItem(ItemStack stack) {
         if(this.size() < MAX_SIZE) {
+
+            ItemStack stackToIncrement = null;
+
             for(ItemStack item : items) {
                 if(item.getItem().getDisplayName().equals(stack.getItem().getDisplayName())) {
-                    item.increment(stack.getCount());
-                    return;
+                    if(stackToIncrement == null && item.getCount() + stack.getCount() <= item.getItem().getMaxStackSize()) stackToIncrement = item;
                 }
             }
-            items.add(stack);
-            stack.setInventory(this);
-            if(items.size() == 1) setSelectedItemSlot(0);
+
+            if(stackToIncrement != null) {
+                stackToIncrement.increment(stack.getCount());
+            }
+            else {
+                items.add(stack);
+                stack.setInventory(this);
+                if(items.size() == 1) setSelectedItemSlot(0);
+            }
         }
     }
 
@@ -105,6 +113,10 @@ public class Inventory implements Iterable<ItemStack> {
         }
         this.selectedItem = items.get(slot);
         this.slot = slot;
+    }
+
+    public int getSelectedItemSlot() {
+        return slot;
     }
 
     public ItemStack getItem(int slot) {

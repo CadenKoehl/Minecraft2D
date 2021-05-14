@@ -12,8 +12,8 @@ public class Texture {
     private Color color;
     private File file;
     private String path;
-    private int width;
-    private int height;
+    private final int width;
+    private final int height;
 
     public Texture(String filePath, int sizeMultiplier) {
         this.path = filePath;

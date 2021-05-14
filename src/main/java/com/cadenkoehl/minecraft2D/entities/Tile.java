@@ -1,7 +1,5 @@
 package com.cadenkoehl.minecraft2D.entities;
 
-import com.cadenkoehl.minecraft2D.block.BlockState;
-import com.cadenkoehl.minecraft2D.block.Blocks;
 import com.cadenkoehl.minecraft2D.display.GameFrame;
 import com.cadenkoehl.minecraft2D.physics.Vec2d;
 import com.cadenkoehl.minecraft2D.render.Renderer;
@@ -61,15 +59,15 @@ public abstract class Tile {
         updatePosY();
     }
 
+    protected void updatePosX(){
+        setScreenPosX(screenPos.x + velocity.x);
+    }
+
     public boolean inFrame() {
         return this.screenPos.y - Renderer.CAMERA.offset.y > -50 &&
                 this.screenPos.y - Renderer.CAMERA.offset.y < 570 &&
                 this.screenPos.x - Renderer.CAMERA.offset.x > -50 &&
                 this.screenPos.x - Renderer.CAMERA.offset.x < GameFrame.WIDTH;
-    }
-
-    protected void updatePosX(){
-        setScreenPosX(screenPos.x + velocity.x);
     }
 
     protected void updatePosY() {
